@@ -25,16 +25,15 @@ public class ScheduleDto {
         @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
 
+        Schedule schedule;
 
         public Schedule toEntity(Club club) {
-            return Schedule.of(
-                    title,
-                    startDate,
-                    endDate,
-                    club,
-                    startTime,
-                    endTime
-                    );
+            return builder().title(schedule.getTitle())
+                    .startDate(schedule.getStartDate())
+                    .endDate(schedule.getEndDate())
+                    .startTime(schedule.getStartTime())
+                    .endTime(schedule.getEndTime())
+                    .build().getSchedule();
         }
     }
 
