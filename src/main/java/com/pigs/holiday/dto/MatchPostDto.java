@@ -19,9 +19,9 @@ public class MatchPostDto {
         String sportCategory;
         LocalDate matchDate;
         String location;
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "hh:mm")
         LocalTime startTime;
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "hh:mm")
         LocalTime endTime;
         String content;
 
@@ -116,9 +116,9 @@ public class MatchPostDto {
         String ClubName;
         String university;
         double mannerScore;
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "hh:mm")
         LocalTime startTime;
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "hh:mm")
         LocalTime endTime;
         String content;
         Boolean myPost;
@@ -145,9 +145,9 @@ public class MatchPostDto {
         String sportCategory;
         LocalDate matchDate;
         String location;
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "hh:mm")
         LocalTime startTime;
-        @JsonFormat(pattern = "HH:mm")
+        @JsonFormat(pattern = "hh:mm")
         LocalTime endTime;
         String content;
     }
