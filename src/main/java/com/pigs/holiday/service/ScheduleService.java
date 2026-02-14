@@ -25,14 +25,14 @@ public class ScheduleService {
     final ClubRepository clubRepository;
     final NotificationRepository notificationRepository;
 
-    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long clubId){
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("schedule Create Error"));
-        Schedule schedule = createReqDto.toEntity(club);
+    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long requestClubId) {
+        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("schedule Create Error"));
+        Schedule schedule = createReqDto.toEntity();
         schedule.setClub(club);
 
-        LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("schedule", today, schedule.getTitle(), false, club, null);
-        notificationRepository.save(notification);
+//        LocalDate today = LocalDate.now();
+//        Notification notification = Notification.of("schedule", today, schedule.getTitle(), false, club, null);
+//        notificationRepository.save(notification);
 
         return ScheduleDto.CreateResDto.toCreateResDto(scheduleRepository.save(schedule));
     }

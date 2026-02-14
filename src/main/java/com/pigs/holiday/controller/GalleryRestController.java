@@ -5,6 +5,7 @@ import com.pigs.holiday.security.PrincipalDetails;
 import com.pigs.holiday.service.FileService;
 import com.pigs.holiday.service.GalleryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,8 +33,8 @@ public class GalleryRestController {
 
     // Create
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("")
-    public ResponseEntity<GalleryDto.CreateResDto> create(@RequestBody GalleryDto.CreateReqDto createReqDto, @RequestPart("images") List<MultipartFile> files,  @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException{
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GalleryDto.CreateResDto> create(@RequestPart("request") GalleryDto.CreateReqDto createReqDto, @RequestPart("images") List<MultipartFile> files,  @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException{
         List<String> s3Urls = fileService.uploadFiles(files, "likepigs/");
 
         return ResponseEntity.ok(galleryService.create(createReqDto, s3Urls, getReqUserId(principalDetails)));
@@ -69,8 +70,8 @@ public class GalleryRestController {
 
     // Update
     @PreAuthorize("hasRole('USER')")
-    @PutMapping("/{galleryId}")
-    public ResponseEntity<GalleryDto.UpdateResDto> update(@PathVariable Long galleryId, @RequestBody GalleryDto.UpdateReqDto updateReqDto, @RequestPart("images") List<MultipartFile> files, @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException{
+    @PutMapping(value = "/{galleryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GalleryDto.UpdateResDto> update(@PathVariable Long galleryId, @RequestPart("request") GalleryDto.UpdateReqDto updateReqDto, @RequestPart(value = "images", required = false) List<MultipartFile> files, @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException{
         List<String> s3Urls = fileService.uploadFiles(files, "likepigs/");
 
         return ResponseEntity.ok(galleryService.update(galleryId, updateReqDto, s3Urls, getReqUserId(principalDetails)));

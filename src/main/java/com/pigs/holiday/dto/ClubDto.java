@@ -22,7 +22,7 @@ public class ClubDto {
         String region;
         String sportCategory;
 
-        public Club toEntity() { return Club.of(getUsername(), getPassword(), getName(), getUniversity(), getPhone(), getEmail(), getClubName(), getDescription(), getRegion(), getSportCategory(), 0, 0, 0, 0, 36.5); }
+        public Club toEntity(String s3Url) { return Club.of(getUsername(), getPassword(), getName(), getUniversity(), getPhone(), getEmail(), getClubName(), getDescription(), getRegion(), getSportCategory(), s3Url, 0, 0, 0, 0, 36.5); }
     }
 
     // Signup Response Dto
@@ -37,55 +37,6 @@ public class ClubDto {
         public String username;
         public String password;
     }
-
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public  static class CreateReqDto{
-        String username;
-        String password;
-        String name;
-        String university;
-        String phone;
-        String email;
-        String clubName;
-        String description;
-        String region;
-        String sportCategory;
-        int totalMatches;
-        int totalWins;
-        int totalDraws;
-        int totalLosses;
-        int mannerScore;
-
-        public Club toEntity() {
-            return Club.of(
-                    getUsername(),
-                    getPassword(),
-                    getName(),
-                    getUniversity(),
-                    getPhone(),
-                    getEmail(),
-                    getClubName(),
-                    getDescription(),
-                    getRegion(),
-                    getSportCategory(),
-                    getTotalMatches(),
-                    0,
-                    0,
-                    0,
-                    36
-            );
-        }
-    }
-
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class CreateResDto {
-        Long clubId;
-
-        public static CreateResDto toCreateResDto(Club club) {
-            return builder().clubId(club.getId()).build();
-        }
-    }
-
 
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class DashboardDetailResDto {
@@ -152,6 +103,7 @@ public class ClubDto {
         String university;
         String phone;
         String email;
+        String imageUrl;
 
         public static SettingDetailResDto toSettingDetailResDto(Club club) {
             return SettingDetailResDto.builder()
@@ -162,6 +114,7 @@ public class ClubDto {
                     .university(club.getUniversity())
                     .phone(club.getPhone())
                     .email(club.getEmail())
+                    .imageUrl(club.getImageUrl())
                     .build();
         }
     }
@@ -175,7 +128,7 @@ public class ClubDto {
         String clubName;
         String phone;
         String email;
-
+        String imageUrl;
     }
 
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor

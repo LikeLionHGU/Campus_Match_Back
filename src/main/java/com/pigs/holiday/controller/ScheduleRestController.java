@@ -17,18 +17,26 @@ import java.util.List;
 @RestController
 public class ScheduleRestController {
 
+    public Long getReqUserId(PrincipalDetails principalDetails) {
+        if(principalDetails == null || principalDetails.getUser() == null || principalDetails.getUser().getId() == null) {
+            return null;
+        }
+
+        return principalDetails.getUser().getId();
+    }
+
     final ScheduleService scheduleService;
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/{clubId}")
-    public ResponseEntity<ScheduleDto.CreateResDto> create(@RequestBody ScheduleDto.CreateReqDto createReqDto, @PathVariable Long clubId) {
-        return ResponseEntity.ok(scheduleService.create(createReqDto, clubId));
+    @PostMapping("")
+    public ResponseEntity<ScheduleDto.CreateResDto> create(@RequestBody ScheduleDto.CreateReqDto createReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(scheduleService.create(createReqDto, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/{clubId}")
-    public ResponseEntity<List<ScheduleDto.ListResDto>> list(@PathVariable Long clubId) {
-        return ResponseEntity.ok(scheduleService.list(clubId));
+    @GetMapping("")
+    public ResponseEntity<List<ScheduleDto.ListResDto>> list(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(scheduleService.list(getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")

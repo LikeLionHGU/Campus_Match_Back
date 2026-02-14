@@ -23,7 +23,7 @@ public class ClubService {
 
 
     // Signup
-    public ClubDto.SignupResDto signup(ClubDto.SignupReqDto signupReqDto){
+    public ClubDto.SignupResDto signup(ClubDto.SignupReqDto signupReqDto, String s3Url) {
 
         Club club = clubRepository.findByUsername(signupReqDto.getUsername()).orElse(null);
         if(club != null) {
@@ -31,7 +31,7 @@ public class ClubService {
         }
 
         signupReqDto.setPassword(bCryptPasswordEncoder.encode(signupReqDto.getPassword()));
-        club = clubRepository.save(signupReqDto.toEntity());
+        club = clubRepository.save(signupReqDto.toEntity(s3Url));
 
         return club.toSignupResDto();
     }
@@ -67,7 +67,7 @@ public class ClubService {
     }
 
     @Transactional
-    public ClubDto.SettingUpdateResDto settingUpdate(ClubDto.SettingUpdateReqDto settingUpdateReqDto, Long clubId) {
+    public ClubDto.SettingUpdateResDto settingUpdate(ClubDto.SettingUpdateReqDto settingUpdateReqDto, Long clubId, String s3Url) {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new EntityNotFoundException("Setting update Error: " + clubId + " not found"));
 
@@ -91,6 +91,9 @@ public class ClubService {
         }
         if(!settingUpdateReqDto.getClubName().isBlank()) {
             club.setClubName(settingUpdateReqDto.getClubName());
+        }
+        if(!s3Url.isBlank()){
+            club.setImageUrl(s3Url);
         }
 
         return ClubDto.SettingUpdateResDto.builder()
