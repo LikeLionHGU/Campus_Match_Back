@@ -32,7 +32,7 @@ public class ClubRestController {
     final FileService fileService;
 
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ClubDto.SignupResDto> signup(@RequestPart("request") ClubDto.SignupReqDto signupReqDto, @RequestPart("image") MultipartFile file)  throws IOException {
+    public ResponseEntity<ClubDto.SignupResDto> signup(@RequestPart("request") ClubDto.SignupReqDto signupReqDto, @RequestPart(value = "image", required = false) MultipartFile file)  throws IOException {
         String s3Url = fileService.uploadFile(file, "likepigs/");
 
         return ResponseEntity.ok(clubService.signup(signupReqDto, s3Url));

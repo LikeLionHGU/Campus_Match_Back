@@ -1,8 +1,5 @@
 package com.pigs.holiday.service;
 
-import com.pigs.holiday.domain.MatchPost;
-import com.pigs.holiday.dto.MatchPostDto;
-import com.pigs.holiday.exception.NoPermissionException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
