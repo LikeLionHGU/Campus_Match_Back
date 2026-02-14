@@ -38,12 +38,6 @@ public class ClubRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("")
-    public ResponseEntity<ClubDto.CreateResDto> create(@RequestBody ClubDto.CreateReqDto createReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return ResponseEntity.ok(clubService.create(createReqDto));
-    }
-
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/dashboard/{clubId}")
     public ResponseEntity<ClubDto.DashboardDetailResDto> dashboardDetail(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return ResponseEntity.ok(clubService.dashboardDetail(clubId));
