@@ -1,5 +1,6 @@
 package com.pigs.holiday.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.OneToMany;
@@ -54,8 +55,9 @@ public class Club extends AuditingFields {
     private List<MatchRequest> matchRequestList = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "userAchievement")
-    private List<UserAchievement> userAchievementsList = new ArrayList<>();
+    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAchievement> userAchievements = new ArrayList<>();
+
     @OneToMany(mappedBy = "club")
     private List<Notification> notificationList = new ArrayList<>();
 
