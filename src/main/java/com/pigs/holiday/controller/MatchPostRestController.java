@@ -61,20 +61,6 @@ public class MatchPostRestController {
         return ResponseEntity.ok(matchPostService.delete(matchPostId, getReqUserId(principalDetails)));
     }
 
-    // UpcomingDashboardList
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/upcoming/dashboard/{clubId}")
-    public ResponseEntity<List<MatchPostDto.DashboardListResDto>> upcomingDashboardList(@PathVariable Long clubId){
-        return ResponseEntity.ok(matchPostService.upcomingDashboardList(clubId));
-    }
-
-    // OngoingDashboardList
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/ongoing/dashboard/{clubId}")
-    public ResponseEntity<List<MatchPostDto.DashboardListResDto>> ongoingDashboardList(@PathVariable Long clubId){
-        return ResponseEntity.ok(matchPostService.ongoingDashboardList(clubId));
-    }
-
     // UpcomingList
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/upcoming/{clubId}")

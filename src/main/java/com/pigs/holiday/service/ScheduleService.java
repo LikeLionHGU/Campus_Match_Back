@@ -89,4 +89,12 @@ public class ScheduleService {
         scheduleRepository.delete(schedule);
         return ScheduleDto.DeleteResDto.builder().reqId(scheduleId).build();
     }
+
+    // ScheduleDashboard
+    @Transactional(readOnly = true)
+    public List<ScheduleDto.DashboardResDto> scheduleDashboard(Long clubId) {
+        List<Schedule> schedulesList = scheduleRepository.findByClubIdAndDeleted(clubId, false);
+
+        return schedulesList.stream().map(ScheduleDto.DashboardResDto::toDashboardResDto).toList();
+    }
 }

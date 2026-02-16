@@ -47,10 +47,18 @@ public class ClubRestController {
         return ResponseEntity.ok(getReqUserId(principalDetails));
     }
 
+    // Info
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/info")
+    public ResponseEntity<ClubDto.InfoResDto> info(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(clubService.info(getReqUserId(principalDetails)));
+    }
+
+    // Dashboard
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/dashboard/{clubId}")
-    public ResponseEntity<ClubDto.DashboardDetailResDto> dashboardDetail(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return ResponseEntity.ok(clubService.dashboardDetail(clubId));
+    public ResponseEntity<ClubDto.DashboardResDto> dashboard(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.dashboard(clubId, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")

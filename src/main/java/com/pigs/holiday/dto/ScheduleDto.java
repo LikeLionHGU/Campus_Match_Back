@@ -129,8 +129,6 @@ public class ScheduleDto {
         Long reqId;
     }
 
-
-
     @Getter
     @Setter
     @Builder
@@ -140,4 +138,21 @@ public class ScheduleDto {
         Long reqId;
     }
 
+    // Dashboard
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class DashboardResDto {
+        Long scheduleId;
+        String title;
+        LocalDate startDate;
+        LocalDate endDate;
+
+        public static DashboardResDto toDashboardResDto(Schedule schedule) {
+            return builder()
+                    .scheduleId(schedule.getId())
+                    .title(schedule.getTitle())
+                    .startDate(schedule.getStartDate())
+                    .endDate(schedule.getEndDate())
+                    .build();
+        }
+    }
 }

@@ -1,9 +1,12 @@
 package com.pigs.holiday.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pigs.holiday.domain.Gallery;
 import lombok.*;
 import com.pigs.holiday.domain.Club;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 
 public class ClubDto {
@@ -38,25 +41,51 @@ public class ClubDto {
         public String password;
     }
 
+    // Info Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class DashboardDetailResDto {
-        Long id;
+    public static class InfoResDto {
+        Long clubId;
+        String clubName;
+        String imageUrl;
+
+        public static ClubDto.InfoResDto toInfoResDto(Club club) {
+            return builder()
+                    .clubId(club.getId())
+                    .clubName(club.getName())
+                    .imageUrl(club.getImageUrl())
+                    .build();
+        }
+    }
+
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class DashboardResDto {
+        Long clubId;
         String clubName;
         String description;
         int totalMatches;
         int totalWins;
         int totalDraws;
         int totalLosses;
-        int mannerScore;
-        Boolean myClub;
-        public static DashboardDetailResDto toDetailResDto(Club club) {
-            return DashboardDetailResDto.builder()
-                    .clubName(club.getClubName())
+        double mannerScore;
+        Boolean isMine;
+
+        List<MatchPostDto.DashboardResDto> upcomingResDtoList;
+        List<MatchPostDto.DashboardResDto> ongoingResDtoList;
+        List<MatchRequestDto.DashboardResDto> receiveResDtoList;
+        List<MatchRequestDto.DashboardResDto> sendResDtoList;
+        List<ScheduleDto.DashboardResDto> scheduleResDtoList;
+        List<GalleryDto.DashboardResDto> galleryResDtoList;
+
+        public static DashboardResDto toDashboardResDto(Club club) {
+            return builder()
+                    .clubId(club.getId())
+                    .clubName(club.getName())
                     .description(club.getDescription())
                     .totalMatches(club.getTotalMatches())
                     .totalWins(club.getTotalWins())
                     .totalDraws(club.getTotalDraws())
                     .totalLosses(club.getTotalLosses())
+                    .mannerScore(club.getMannerScore())
                     .build();
         }
     }

@@ -55,6 +55,7 @@ public class MatchPostDto {
         LocalDate matchDate;
         String location;
         Long clubId;
+        String imageUrl;
         String clubName;
         String university;
         double mannerScore;
@@ -68,6 +69,7 @@ public class MatchPostDto {
                     .matchDate(matchPost.getMatchDate())
                     .location(matchPost.getLocation())
                     .clubId(matchPost.getHomeClub().getId())
+                    .imageUrl(matchPost.getHomeClub().getImageUrl())
                     .clubName(matchPost.getHomeClub().getClubName())
                     .university(matchPost.getHomeClub().getUniversity())
                     .mannerScore(matchPost.getHomeClub().getMannerScore())
@@ -83,6 +85,7 @@ public class MatchPostDto {
                     .matchDate(matchPost.getMatchDate())
                     .location(matchPost.getLocation())
                     .clubId(matchPost.getAwayClub().getId())
+                    .imageUrl(matchPost.getAwayClub().getImageUrl())
                     .clubName(matchPost.getAwayClub().getClubName())
                     .university(matchPost.getAwayClub().getUniversity())
                     .mannerScore(matchPost.getAwayClub().getMannerScore())
@@ -98,6 +101,7 @@ public class MatchPostDto {
                     .matchDate(matchPost.getMatchDate())
                     .location(matchPost.getLocation())
                     .clubId(matchPost.getHomeClub().getId())
+                    .imageUrl(matchPost.getHomeClub().getImageUrl())
                     .clubName(matchPost.getHomeClub().getClubName())
                     .university(matchPost.getHomeClub().getUniversity())
                     .mannerScore(matchPost.getHomeClub().getMannerScore())
@@ -166,13 +170,13 @@ public class MatchPostDto {
 
     // Dashboard Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class DashboardListResDto {
+    public static class DashboardResDto {
         Long matchPostId;
         LocalDate matchDate;
         String university;
         String clubName;
 
-        public static DashboardListResDto toDashboardHomeListResDto(MatchPost matchPost) {
+        public static DashboardResDto toDashboardHomeResDto(MatchPost matchPost) {
             return builder()
                     .matchPostId(matchPost.getId())
                     .matchDate(matchPost.getMatchDate())
@@ -181,7 +185,7 @@ public class MatchPostDto {
                     .build();
         }
 
-        public static DashboardListResDto toDashboardAwayListResDto(MatchPost matchPost) {
+        public static DashboardResDto toDashboardAwayResDto(MatchPost matchPost) {
             return builder()
                     .matchPostId(matchPost.getId())
                     .matchDate(matchPost.getMatchDate())

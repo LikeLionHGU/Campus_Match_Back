@@ -91,4 +91,22 @@ public class GalleryDto {
             return builder().galleryId(gallery.getId()).build();
         }
     }
+
+    // Dashboard
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class DashboardResDto {
+        Long galleryId;
+        String title;
+        LocalDate matchDate;
+        String imageUrl;
+
+        public static DashboardResDto toDashboardResDto(Gallery gallery) {
+            return builder()
+                    .galleryId(gallery.getId())
+                    .title(gallery.getTitle())
+                    .matchDate(gallery.getMatchDate())
+                    .imageUrl(gallery.getGalleryImageList().get(0).getImageUrl())
+                    .build();
+        }
+    }
 }

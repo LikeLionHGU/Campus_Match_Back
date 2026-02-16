@@ -132,4 +132,11 @@ public class GalleryService {
 
         return GalleryDto.DeleteResDto.toDeleteResDto(gallery);
     }
+
+    // Gallery Dashboard
+    public List<GalleryDto.DashboardResDto> galleryDashboard(Long clubId) {
+        List<Gallery> galleryList = galleryRepository.findByIdAndDeletedAndIsOfficial(clubId, false, true);
+
+        return galleryList.stream().map(GalleryDto.DashboardResDto::toDashboardResDto).toList();
+    }
 }
