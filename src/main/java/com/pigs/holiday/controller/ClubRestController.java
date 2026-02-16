@@ -33,7 +33,10 @@ public class ClubRestController {
 
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ClubDto.SignupResDto> signup(@RequestPart("request") ClubDto.SignupReqDto signupReqDto, @RequestPart(value = "image", required = false) MultipartFile file)  throws IOException {
-        String s3Url = fileService.uploadFile(file, "likepigs/");
+        String s3Url = null;
+        if (file != null && !file.isEmpty()) {
+            s3Url = fileService.uploadFile(file, "likepigs/");
+        }
 
         return ResponseEntity.ok(clubService.signup(signupReqDto, s3Url));
     }
@@ -71,7 +74,10 @@ public class ClubRestController {
     @PreAuthorize("hasRole('USER')")
     @PutMapping(value = "/setting/{clubId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ClubDto.SettingUpdateResDto> settingUpdate(@PathVariable Long clubId, @RequestPart("request") ClubDto.SettingUpdateReqDto settingUpdateReqDto, @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
-        String s3Url = fileService.uploadFile(file, "likepigs/");
+        String s3Url = null;
+        if (file != null && !file.isEmpty()) {
+            s3Url = fileService.uploadFile(file, "likepigs/");
+        }
 
         return ResponseEntity.ok(clubService.settingUpdate(settingUpdateReqDto, clubId, s3Url));
     }

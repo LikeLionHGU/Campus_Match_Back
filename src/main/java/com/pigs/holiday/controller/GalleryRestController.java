@@ -72,7 +72,10 @@ public class GalleryRestController {
     @PreAuthorize("hasRole('USER')")
     @PutMapping(value = "/{galleryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GalleryDto.UpdateResDto> update(@PathVariable Long galleryId, @RequestPart("request") GalleryDto.UpdateReqDto updateReqDto, @RequestPart(value = "images", required = false) List<MultipartFile> files, @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException{
-        List<String> s3Urls = fileService.uploadFiles(files, "likepigs/");
+        List<String> s3Urls = null;
+        if (files != null && !files.isEmpty()) {
+            s3Urls = fileService.uploadFiles(files, "likepigs/");
+        }
 
         return ResponseEntity.ok(galleryService.update(galleryId, updateReqDto, s3Urls, getReqUserId(principalDetails)));
     }

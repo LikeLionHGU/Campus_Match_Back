@@ -61,6 +61,7 @@ public class GalleryService {
     }
 
     // MyClubList
+    @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> myClubList(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery MyClubList Error"));
         List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficial(club, false);
@@ -69,6 +70,7 @@ public class GalleryService {
     }
 
     // Detail
+    @Transactional(readOnly = true)
     public GalleryDto.DetailResDto detail(Long galleryId, Long requestClubId) {
         Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Detail Error"));
         Gallery gallery = galleryRepository.findById(galleryId).orElseThrow(() -> new EntityNotFoundException("Gallery Detail Error"));

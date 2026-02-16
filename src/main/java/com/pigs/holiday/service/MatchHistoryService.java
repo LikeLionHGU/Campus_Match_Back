@@ -7,9 +7,9 @@ import com.pigs.holiday.dto.MatchHistoryDto;
 import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.MatchHistoryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +34,8 @@ public class MatchHistoryService {
 
     }
 
+
+    @Transactional(readOnly = true)
     public List<MatchHistoryDto.ListResDto> list(Long clubId) {
         List<MatchHistory> matchesHistory = matchHistoryRepository.findByClubId(clubId);
         return matchesHistory.stream()

@@ -3,6 +3,8 @@ package com.pigs.holiday.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pigs.holiday.domain.Club;
+import com.pigs.holiday.domain.MatchPost;
+import com.pigs.holiday.domain.MatchRequest;
 import com.pigs.holiday.domain.Schedule;
 import lombok.*;
 
@@ -20,19 +22,13 @@ public class ScheduleDto {
         String title;
         LocalDate startDate;
         LocalDate endDate;
-        @JsonFormat(pattern = "hh:mm")
+        @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
-        @JsonFormat(pattern = "hh:mm")
+        @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
-        Schedule schedule;
 
-        public Schedule toEntity() {
-            return builder().title(schedule.getTitle())
-                    .startDate(schedule.getStartDate())
-                    .endDate(schedule.getEndDate())
-                    .startTime(schedule.getStartTime())
-                    .endTime(schedule.getEndTime())
-                    .build().getSchedule();
+        public Schedule toEntity(Club club) {
+            return Schedule.of(getTitle(), getStartDate(), getEndDate(), club, getStartTime(), getEndTime());
         }
     }
 
@@ -91,7 +87,7 @@ public class ScheduleDto {
         LocalTime startTime;
         @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
-        private Club club;
+        Long clubId;
         Boolean myClub;
 
 
@@ -103,7 +99,7 @@ public class ScheduleDto {
                     .endDate(schedule.getEndDate())
                     .startTime(schedule.getStartTime())
                     .endTime(schedule.getEndTime())
-                    .club(schedule.getClub())
+                    .clubId(schedule.getClub().getId())
                     .build();
         }
     }
@@ -116,9 +112,7 @@ public class ScheduleDto {
     public static class UpdateReqDto{
         Long id;
         String title;
-        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate startDate;
-        @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate endDate;
         @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;

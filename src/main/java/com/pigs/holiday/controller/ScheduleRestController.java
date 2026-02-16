@@ -46,7 +46,7 @@ public class ScheduleRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PutMapping("/detail/{scheduleId}")
+    @PutMapping("/{scheduleId}")
     public ResponseEntity<ScheduleDto.UpdateResDto> update(@RequestBody ScheduleDto.UpdateReqDto updateReqDto, @PathVariable Long scheduleId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return ResponseEntity.ok(scheduleService.update(updateReqDto, scheduleId, principalDetails.getClub().getId()));
     }
