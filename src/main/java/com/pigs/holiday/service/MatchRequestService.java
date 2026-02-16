@@ -138,6 +138,9 @@ public class MatchRequestService {
         return matchRequestList.stream().map(matchRequest -> MatchRequestDto.ListResDto.toSendListResDto(matchRequest, clubId.equals(requestClubId))).toList();
     }
 
+
+
+
     // SendDetail
     @Transactional(readOnly = true)
     public MatchRequestDto.DetailResDto sendDetail(Long matchRequestId){
@@ -146,6 +149,7 @@ public class MatchRequestService {
     }
 
     // SendDelete
+    @Transactional//여기 transactional 추가 해놨습니다.
     public MatchRequestDto.DeleteResDto sendDelete(Long matchRequestId, Long requestClubId){
         MatchRequest matchRequest = matchRequestRepository.findById(matchRequestId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDelete Error"));
         if(!matchRequest.getSenderClub().getId().equals(requestClubId)) {
@@ -153,9 +157,12 @@ public class MatchRequestService {
         }
 
         // notification
+        //제가 일단 notification 넣었고
+        LocalDate today = LocalDate.now();
+        Notification notification = Notification.of("sendNo", today, "", false, matchRequest.getMatchPost().getAwayClub(), matchRequest.getMatchPost().getHomeClub());
+        notificationRepository.save(notification);
 
         matchRequestRepository.deleteById(matchRequestId);
         return MatchRequestDto.DeleteResDto.builder().matchRequestId(matchRequest.getId()).build();
-
     }
 }
