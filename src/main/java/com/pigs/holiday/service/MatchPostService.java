@@ -7,9 +7,9 @@ import com.pigs.holiday.exception.NoPermissionException;
 import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.MatchPostRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ public class MatchPostService {
     }
 
     // List
+    @Transactional(readOnly = true)
     public List<MatchPostDto.ListResDto> list(Long requestClubId){
         List<MatchPost> matchPostList = matchPostRepository.findByDeletedAndStatus(false, false);
 
@@ -40,6 +41,7 @@ public class MatchPostService {
     }
 
     // Detail
+    @Transactional(readOnly = true)
     public MatchPostDto.DetailResDto detail(Long matchPostId, Long requestClubId){
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost Detail Error"));
         MatchPostDto.DetailResDto detailResDto = MatchPostDto.DetailResDto.toDetailResDto(matchPost);
@@ -93,6 +95,7 @@ public class MatchPostService {
     }
 
     // UpcomingDashboard
+    @Transactional(readOnly = true)
     public List<MatchPostDto.DashboardListResDto> upcomingDashboardList(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingDashboard Error"));
 
@@ -111,6 +114,7 @@ public class MatchPostService {
     }
 
     // OngoingDashboard
+    @Transactional(readOnly = true)
     public List<MatchPostDto.DashboardListResDto> ongoingDashboardList(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingDashboard Error"));
 
@@ -127,6 +131,7 @@ public class MatchPostService {
     }
 
     // UpcomingList
+    @Transactional(readOnly = true)
     public List<MatchPostDto.ListResDto> upcomingList(Long clubId, Long requestClubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingList Error"));
 
@@ -145,6 +150,7 @@ public class MatchPostService {
     }
 
     // UpcomingDetail
+    @Transactional(readOnly = true)
     public MatchPostDto.IngDetailResDto upcomingDetail(Long clubId, Long matchPostId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingDetail Error"));
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingDetail Error"));
@@ -175,6 +181,7 @@ public class MatchPostService {
     }
 
     // OngoingList
+    @Transactional(readOnly = true)
     public List<MatchPostDto.ListResDto> ongoingList(Long clubId, Long requestClubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost OngoingList Error"));
 
@@ -191,6 +198,7 @@ public class MatchPostService {
     }
 
     // OngoingDetail
+    @Transactional(readOnly = true)
     public MatchPostDto.IngDetailResDto ongoingDetail(Long clubId, Long matchPostId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost OngoingDetail Error"));
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost OngoingDetail Error"));
@@ -241,6 +249,7 @@ public class MatchPostService {
     }
 
     // FinishDetail
+    @Transactional(readOnly = true)
     public MatchPostDto.FinishDetailResDto finishDetail(Long matchPostId, Long requestClubId){
         Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchPost OngoingDetail Error"));
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost OngoingDetail Error"));
@@ -255,6 +264,7 @@ public class MatchPostService {
     }
 
     // ScheduleList
+    @Transactional(readOnly = true)
     public List<MatchPostDto.ScheduleListResDto> scheduleList(Long clubId, Long requestClubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost ScheduleList Error"));
         List<MatchPost> matchPostHomeListFalse = matchPostRepository.findByHomeClubAndDeletedAndStatus(club, false, false);
@@ -272,6 +282,7 @@ public class MatchPostService {
     }
 
     // ScheduleDetail
+    @Transactional(readOnly = true)
     public MatchPostDto.ScheduleDetailResDto scheduleDetail(Long clubId, Long matchPostId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost ScheduleDetail Error"));
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost ScheduleDetail Error"));

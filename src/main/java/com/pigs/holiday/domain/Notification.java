@@ -24,7 +24,7 @@ public class Notification extends AuditingFields {
     private Club club;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "away_club_id", nullable = false)
+    @JoinColumn(name = "away_club_id", nullable = true)
     private Club awayClub;
 
     protected Notification(){}

@@ -9,9 +9,9 @@ import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.GalleryImageRepository;
 import com.pigs.holiday.repository.GalleryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,6 +43,7 @@ public class GalleryService {
     }
 
     // List
+    @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> list(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery List Error"));
         List<Gallery> galleryList = galleryRepository.findByClub(club);
@@ -51,6 +52,7 @@ public class GalleryService {
     }
 
     // MatchList
+    @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> matchList(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery MyClubList Error"));
         List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficial(club, true);
@@ -59,6 +61,7 @@ public class GalleryService {
     }
 
     // MyClubList
+    @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> myClubList(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery MyClubList Error"));
         List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficial(club, false);
@@ -67,6 +70,7 @@ public class GalleryService {
     }
 
     // Detail
+    @Transactional(readOnly = true)
     public GalleryDto.DetailResDto detail(Long galleryId, Long requestClubId) {
         Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Detail Error"));
         Gallery gallery = galleryRepository.findById(galleryId).orElseThrow(() -> new EntityNotFoundException("Gallery Detail Error"));

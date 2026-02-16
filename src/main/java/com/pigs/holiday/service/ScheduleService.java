@@ -4,15 +4,15 @@ import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.Notification;
 import com.pigs.holiday.domain.Schedule;
 import com.pigs.holiday.dto.ScheduleDto;
+import com.pigs.holiday.exception.NoPermissionException;
 import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.NotificationRepository;
 import com.pigs.holiday.repository.ScheduleRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,19 +25,19 @@ public class ScheduleService {
     final ClubRepository clubRepository;
     final NotificationRepository notificationRepository;
 
-    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long clubId){
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("schedule Create Error"));
+    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long requestClubId) {
+        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("schedule Create Error"));
         Schedule schedule = createReqDto.toEntity(club);
-        schedule.setClub(club);
 
-        LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("schedule", today, schedule.getTitle(), false, club, null);
-        notificationRepository.save(notification);
+//        LocalDate today = LocalDate.now();
+//        Notification notification = Notification.of("schedule", today, schedule.getTitle(), false, club, null);
+//        notificationRepository.save(notification);
 
         return ScheduleDto.CreateResDto.toCreateResDto(scheduleRepository.save(schedule));
     }
 
     //여기 고쳐야함 씨부럴
+    @Transactional(readOnly = true)
     public List<ScheduleDto.ListResDto> list(Long clubId) {
         List<Schedule> schedulesList = scheduleRepository.findByClubIdAndDeleted(clubId, false);
 
@@ -46,6 +46,7 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ScheduleDto.DetailResDto detail(Long ScheduleId, Long clubId){
         Schedule schedule = scheduleRepository.findById(ScheduleId).orElseThrow(() -> new EntityNotFoundException("schedule Detail Error"));
         ScheduleDto.DetailResDto detailResDto = ScheduleDto.DetailResDto.toDetailResDto(schedule);
@@ -54,13 +55,13 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleDto.UpdateResDto update(ScheduleDto.UpdateReqDto reqDto, Long scheduleId, Long clubId) { // reqDto 필수!
+    public ScheduleDto.UpdateResDto update(ScheduleDto.UpdateReqDto reqDto, Long scheduleId, Long requestClubId) { // reqDto 필수!
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException("Schedule Update Error"));
 
-        if (!schedule.getClub().getId().equals(clubId)) {
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        if (!schedule.getClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("Schedule Update Error");
         }
 
         if (reqDto.getTitle() != null && !reqDto.getTitle().isBlank()) {

@@ -11,9 +11,9 @@ import com.pigs.holiday.repository.MatchPostRepository;
 import com.pigs.holiday.repository.MatchRequestRepository;
 import com.pigs.holiday.repository.NotificationRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,6 +44,7 @@ public class MatchRequestService {
     }
 
     // ReceiveDashboardList
+    @Transactional(readOnly = true)
     public List<MatchRequestDto.DashboardListResDto> receiveDashboardList(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDashboardList Error"));
         List<MatchPost> matchPostList = matchPostRepository.findByHomeClubAndStatusAndDeleted(club, false, false);
@@ -58,6 +59,7 @@ public class MatchRequestService {
     }
 
     // SendDashboardList
+    @Transactional(readOnly = true)
     public List<MatchRequestDto.DashboardListResDto> sendDashboardList(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest SendDashboardList Error"));
         List<MatchRequest> matchRequestList = matchRequestRepository.findBySenderClub(club);
@@ -66,6 +68,7 @@ public class MatchRequestService {
     }
 
     // ReceiveList
+    @Transactional(readOnly = true)
     public List<MatchRequestDto.ListResDto> receiveList(Long clubId, Long requestClubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveList Error"));
         List<MatchPost> matchPostList = matchPostRepository.findByHomeClubAndStatusAndDeleted(club, false, false);
@@ -80,6 +83,7 @@ public class MatchRequestService {
     }
 
     // ReceiveDetail
+    @Transactional(readOnly = true)
     public MatchRequestDto.DetailResDto receiveDetail(Long matchRequestId){
         MatchRequest matchRequest = matchRequestRepository.findById(matchRequestId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDetail Error"));
         return MatchRequestDto.DetailResDto.toReceiveDetailResDto(matchRequest);
@@ -126,6 +130,7 @@ public class MatchRequestService {
     }
 
     // SendList
+    @Transactional(readOnly = true)
     public List<MatchRequestDto.ListResDto> sendList(Long clubId, Long requestClubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest SendDashboardList Error"));
         List<MatchRequest> matchRequestList = matchRequestRepository.findBySenderClub(club);
@@ -134,6 +139,7 @@ public class MatchRequestService {
     }
 
     // SendDetail
+    @Transactional(readOnly = true)
     public MatchRequestDto.DetailResDto sendDetail(Long matchRequestId){
         MatchRequest matchRequest = matchRequestRepository.findById(matchRequestId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDetail Error"));
         return MatchRequestDto.DetailResDto.toSendDetailResDto(matchRequest);

@@ -1,14 +1,18 @@
 package com.pigs.holiday.controller;
 
 import com.pigs.holiday.security.PrincipalDetails;
+import com.pigs.holiday.service.FileService;
 import lombok.RequiredArgsConstructor;
 import com.pigs.holiday.dto.ClubDto;
 import com.pigs.holiday.service.ClubService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,10 +29,16 @@ public class ClubRestController {
     }
 
     final ClubService clubService;
+    final FileService fileService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<ClubDto.SignupResDto> signup(@RequestBody ClubDto.SignupReqDto signupReqDto) {
-        return ResponseEntity.ok(clubService.signup(signupReqDto));
+    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ClubDto.SignupResDto> signup(@RequestPart("request") ClubDto.SignupReqDto signupReqDto, @RequestPart(value = "image", required = false) MultipartFile file)  throws IOException {
+        String s3Url = null;
+        if (file != null && !file.isEmpty()) {
+            s3Url = fileService.uploadFile(file, "likepigs/");
+        }
+
+        return ResponseEntity.ok(clubService.signup(signupReqDto, s3Url));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -55,16 +65,21 @@ public class ClubRestController {
         return ResponseEntity.ok(clubService.dashboardUpdate(dashboardUpdateReqDto, clubId));
     }
 
-//    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/setting/{clubId}")
     public ResponseEntity<ClubDto.SettingDetailResDto> settingDetail(@PathVariable Long clubId) {
         return ResponseEntity.ok(clubService.settingDetail(clubId));
     }
 
-//    @PreAuthorize("hasRole('USER')")
-    @PutMapping("/setting/{clubId}")
-    public ResponseEntity<ClubDto.SettingUpdateResDto> settingUpdate(@RequestBody ClubDto.SettingUpdateReqDto settingUpdateReqDto, @PathVariable Long clubId) {
-        return ResponseEntity.ok(clubService.settingUpdate(settingUpdateReqDto, clubId));
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping(value = "/setting/{clubId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ClubDto.SettingUpdateResDto> settingUpdate(@PathVariable Long clubId, @RequestPart("request") ClubDto.SettingUpdateReqDto settingUpdateReqDto, @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
+        String s3Url = null;
+        if (file != null && !file.isEmpty()) {
+            s3Url = fileService.uploadFile(file, "likepigs/");
+        }
+
+        return ResponseEntity.ok(clubService.settingUpdate(settingUpdateReqDto, clubId, s3Url));
     }
 
     @PreAuthorize("hasRole('USER')")

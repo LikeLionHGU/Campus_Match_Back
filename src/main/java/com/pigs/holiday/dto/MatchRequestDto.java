@@ -1,5 +1,6 @@
 package com.pigs.holiday.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pigs.holiday.domain.MatchRequest;
 import lombok.*;
 
@@ -12,7 +13,9 @@ public class MatchRequestDto {
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto {
         Long senderClubId;
+        @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
+        @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
 
         public MatchRequest toEntity() {
@@ -105,7 +108,9 @@ public class MatchRequestDto {
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class DetailResDto {
         LocalDate matchDate;
+        @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
+        @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
         String location;
         String phone;
