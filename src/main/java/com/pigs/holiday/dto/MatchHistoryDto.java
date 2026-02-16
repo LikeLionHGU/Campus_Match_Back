@@ -68,6 +68,7 @@ public class MatchHistoryDto {
         Long matchHistoryId;
         LocalDate matchDate;
         String university;
+        String imageUrl;
         String clubName;
         String location;
         String result;
@@ -78,6 +79,7 @@ public class MatchHistoryDto {
                     .matchHistoryId(matchHistory.getId())
                     .matchDate(matchHistory.getMatchDate())
                     .university(matchHistory.getHomeClub().getUniversity())
+                    .imageUrl(matchHistory.getHomeClub().getImageUrl())
                     .clubName(matchHistory.getHomeClub().getClubName())
                     .location(matchHistory.getLocation())
                     .result(matchHistory.getResult())

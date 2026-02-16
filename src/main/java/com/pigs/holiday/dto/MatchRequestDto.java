@@ -37,13 +37,13 @@ public class MatchRequestDto {
 
     // Dashboard List Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class DashboardListResDto {
+    public static class DashboardResDto {
         Long matchRequestId;
         LocalDate matchDate;
         String university;
         String clubName;
 
-        public static DashboardListResDto toDashboardReceiveListResDto(MatchRequest matchRequest) {
+        public static DashboardResDto toDashboardReceiveResDto(MatchRequest matchRequest) {
             return builder()
                     .matchRequestId(matchRequest.getId())
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
@@ -52,7 +52,7 @@ public class MatchRequestDto {
                     .build();
         }
 
-        public static DashboardListResDto toDashboardSendListResDto(MatchRequest matchRequest) {
+        public static DashboardResDto toDashboardSendResDto(MatchRequest matchRequest) {
             return builder()
                     .matchRequestId(matchRequest.getId())
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
@@ -71,8 +71,10 @@ public class MatchRequestDto {
         LocalDate matchDate;
         String location;
         Long clubId;
+        String imageUrl;
         String clubName;
         String university;
+        double mannerScore;
         Boolean myRequest;
 
         public static ListResDto toReceiveListResDto(MatchRequest matchRequest, Boolean myRequest) {
@@ -83,8 +85,10 @@ public class MatchRequestDto {
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .location(matchRequest.getMatchPost().getLocation())
                     .clubId(matchRequest.getSenderClub().getId())
+                    .imageUrl(matchRequest.getSenderClub().getImageUrl())
                     .clubName(matchRequest.getSenderClub().getClubName())
                     .university(matchRequest.getSenderClub().getUniversity())
+                    .mannerScore(matchRequest.getSenderClub().getMannerScore())
                     .myRequest(myRequest)
                     .build();
         }
@@ -97,8 +101,10 @@ public class MatchRequestDto {
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .location(matchRequest.getMatchPost().getLocation())
                     .clubId(matchRequest.getMatchPost().getHomeClub().getId())
+                    .imageUrl(matchRequest.getMatchPost().getHomeClub().getImageUrl())
                     .clubName(matchRequest.getMatchPost().getHomeClub().getClubName())
                     .university(matchRequest.getMatchPost().getHomeClub().getUniversity())
+                    .mannerScore(matchRequest.getMatchPost().getHomeClub().getMannerScore())
                     .myRequest(myRequest)
                     .build();
         }

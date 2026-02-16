@@ -45,7 +45,7 @@ public class MatchRequestService {
 
     // ReceiveDashboardList
     @Transactional(readOnly = true)
-    public List<MatchRequestDto.DashboardListResDto> receiveDashboardList(Long clubId){
+    public List<MatchRequestDto.DashboardResDto> receiveDashboard(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDashboardList Error"));
         List<MatchPost> matchPostList = matchPostRepository.findByHomeClubAndStatusAndDeleted(club, false, false);
 
@@ -55,16 +55,16 @@ public class MatchRequestService {
             matchRequestList.addAll(matchPost.getMatchRequestList());
         }
 
-        return matchRequestList.stream().map(MatchRequestDto.DashboardListResDto::toDashboardReceiveListResDto).toList();
+        return matchRequestList.stream().map(MatchRequestDto.DashboardResDto::toDashboardReceiveResDto).toList();
     }
 
     // SendDashboardList
     @Transactional(readOnly = true)
-    public List<MatchRequestDto.DashboardListResDto> sendDashboardList(Long clubId){
+    public List<MatchRequestDto.DashboardResDto> sendDashboard(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest SendDashboardList Error"));
         List<MatchRequest> matchRequestList = matchRequestRepository.findBySenderClub(club);
 
-        return matchRequestList.stream().map(MatchRequestDto.DashboardListResDto::toDashboardSendListResDto).toList();
+        return matchRequestList.stream().map(MatchRequestDto.DashboardResDto::toDashboardSendResDto).toList();
     }
 
     // ReceiveList

@@ -33,20 +33,6 @@ public class MatchRequestRestController {
         return ResponseEntity.ok(matchRequestService.create(matchPostId, createReqDto, getReqUserId(principalDetails)));
     }
 
-    // ReceiveDashboardList
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/receive/deshboard/{clubId}")
-    public ResponseEntity<List<MatchRequestDto.DashboardListResDto>> receiveDashboardList(@PathVariable Long clubId){
-        return ResponseEntity.ok(matchRequestService.receiveDashboardList(clubId));
-    }
-
-    // SendDashboardList
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/send/dashboard/{clubId}")
-    public ResponseEntity<List<MatchRequestDto.DashboardListResDto>> sendDashboardList(@PathVariable Long clubId){
-        return ResponseEntity.ok(matchRequestService.sendDashboardList(clubId));
-    }
-
     // ReceiveList
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/receive/{clubId}")

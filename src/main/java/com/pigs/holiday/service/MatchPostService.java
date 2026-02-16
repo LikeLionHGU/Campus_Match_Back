@@ -96,36 +96,36 @@ public class MatchPostService {
 
     // UpcomingDashboard
     @Transactional(readOnly = true)
-    public List<MatchPostDto.DashboardListResDto> upcomingDashboardList(Long clubId){
+    public List<MatchPostDto.DashboardResDto> upcomingDashboard(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingDashboard Error"));
 
         LocalDate today = LocalDate.now();
         List<MatchPost> matchPostHomeList = matchPostRepository.findByHomeClubAndDeletedAndStatusAndMatchDateGreaterThan(club,false, true, today);
         List<MatchPost> matchPostAwayList = matchPostRepository.findByAwayClubAndDeletedAndStatusAndMatchDateGreaterThan(club,false, true, today);
 
-        List<MatchPostDto.DashboardListResDto> dashboardListResDtoList = new ArrayList<>();
+        List<MatchPostDto.DashboardResDto> dashboardListResDtoList = new ArrayList<>();
 
-        dashboardListResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.DashboardListResDto::toDashboardHomeListResDto).toList());
-        dashboardListResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.DashboardListResDto::toDashboardAwayListResDto).toList());
+        dashboardListResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.DashboardResDto::toDashboardHomeResDto).toList());
+        dashboardListResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.DashboardResDto::toDashboardAwayResDto).toList());
 
-        dashboardListResDtoList.sort(Comparator.comparing(MatchPostDto.DashboardListResDto::getMatchDate));
+        dashboardListResDtoList.sort(Comparator.comparing(MatchPostDto.DashboardResDto::getMatchDate));
 
         return dashboardListResDtoList;
     }
 
     // OngoingDashboard
     @Transactional(readOnly = true)
-    public List<MatchPostDto.DashboardListResDto> ongoingDashboardList(Long clubId){
+    public List<MatchPostDto.DashboardResDto> ongoingDashboard(Long clubId){
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingDashboard Error"));
 
         LocalDate today = LocalDate.now();
         List<MatchPost> matchPostHomeList = matchPostRepository.findByHomeClubAndDeletedAndStatusAndMatchDate(club,false, true, today);
         List<MatchPost> matchPostAwayList = matchPostRepository.findByAwayClubAndDeletedAndStatusAndMatchDate(club,false, true, today);
 
-        List<MatchPostDto.DashboardListResDto> dashboardListResDtoList = new ArrayList<>();
+        List<MatchPostDto.DashboardResDto> dashboardListResDtoList = new ArrayList<>();
 
-        dashboardListResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.DashboardListResDto::toDashboardHomeListResDto).toList());
-        dashboardListResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.DashboardListResDto::toDashboardAwayListResDto).toList());
+        dashboardListResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.DashboardResDto::toDashboardHomeResDto).toList());
+        dashboardListResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.DashboardResDto::toDashboardAwayResDto).toList());
 
         return dashboardListResDtoList;
     }

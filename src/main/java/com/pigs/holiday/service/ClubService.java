@@ -18,6 +18,10 @@ public class ClubService {
     final ClubRepository clubRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    private final MatchPostService matchPostService;
+    private final MatchRequestService matchRequestService;
+    private final ScheduleService scheduleService;
+    private final GalleryService galleryService;
 
     // Signup
     public ClubDto.SignupResDto signup(ClubDto.SignupReqDto signupReqDto, String s3Url) {
@@ -33,13 +37,29 @@ public class ClubService {
         return club.toSignupResDto();
     }
 
+    // Info
+    @Transactional(readOnly = true)
+    public ClubDto.InfoResDto info(Long requestClubId) {
+        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Club Info Error"));
+
+        return ClubDto.InfoResDto.toInfoResDto(club);
+    }
+
 
     @Transactional(readOnly = true)
-    public ClubDto.DashboardDetailResDto dashboardDetail(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("clubDetail Error"));
-        ClubDto.DashboardDetailResDto detailResDto = ClubDto.DashboardDetailResDto.toDetailResDto(club);
-        detailResDto.setMyClub(clubId.equals(club.getId()));
-        return detailResDto;
+    public ClubDto.DashboardResDto dashboard(Long clubId, Long requestClubId) {
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Club Dashboard Error"));
+
+        ClubDto.DashboardResDto dashboardResDto = ClubDto.DashboardResDto.toDashboardResDto(club);
+        dashboardResDto.setIsMine(clubId.equals(requestClubId));
+        dashboardResDto.setUpcomingResDtoList(matchPostService.upcomingDashboard(clubId));
+        dashboardResDto.setOngoingResDtoList(matchPostService.ongoingDashboard(clubId));
+        dashboardResDto.setReceiveResDtoList(matchRequestService.receiveDashboard(clubId));
+        dashboardResDto.setSendResDtoList(matchRequestService.sendDashboard(clubId));
+        dashboardResDto.setScheduleResDtoList(scheduleService.scheduleDashboard(clubId));
+        dashboardResDto.setGalleryResDtoList(galleryService.galleryDashboard(clubId));
+
+        return dashboardResDto;
     }
 
     @Transactional(readOnly = true)
