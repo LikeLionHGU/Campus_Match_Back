@@ -26,7 +26,7 @@ public class MatchHistoryRestController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
-    public ResponseEntity<List<MatchHistoryDto.ListResDto>> list(@RequestBody MatchHistoryDto.ListReqDto listReqDto) {
+    public ResponseEntity<List<MatchHistoryDto.ListResDto>> list(@RequestParam MatchHistoryDto.ListReqDto listReqDto) {
         return ResponseEntity.ok(matchHistoryService.list(listReqDto.getClubId()));
     }
 
