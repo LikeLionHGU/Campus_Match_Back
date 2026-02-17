@@ -16,13 +16,6 @@ public class AchievementDto {
         private Long id;
         private String title;
         private String imageUrl;
-
-        public static ListResDto from(Achievement achievement) {
-            return ListResDto.builder()
-                    .id(achievement.getId())
-                    .title(achievement.getTitle())
-                    .imageUrl(achievement.getImageUrl())
-                    .build();
-        }
+        Boolean isAcquired;
     }
 }

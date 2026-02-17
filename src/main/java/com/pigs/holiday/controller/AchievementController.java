@@ -3,7 +3,6 @@ package com.pigs.holiday.controller;
 import com.pigs.holiday.dto.AchievementDto;
 import com.pigs.holiday.security.PrincipalDetails;
 import com.pigs.holiday.service.AchievementService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,9 +21,9 @@ public class AchievementController {
 
     final AchievementService achievementService;
 
-    @GetMapping("/{clubId}")
+    @GetMapping("")
     public ResponseEntity<List<AchievementDto.ListResDto>> list(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        Long clubId = principalDetails.getUser().getId();
+        Long clubId = principalDetails.getClub().getId();
         return ResponseEntity.ok(achievementService.checkAndAssignAchievements(clubId));
     }
 }
