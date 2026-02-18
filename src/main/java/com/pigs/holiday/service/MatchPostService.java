@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,29 +26,44 @@ public class MatchPostService {
 
     // Create
     public MatchPostDto.CreateResDto create(MatchPostDto.CreateReqDto createReqDto, Long requestClubId){
-        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchPost Create Error"));
-        MatchPost matchPost = createReqDto.toEntity();
-        matchPost.setHomeClub(club);
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchPost Create Error"));
+        MatchPost matchPost = createReqDto.toEntity(requestClub);
 
         return MatchPostDto.CreateResDto.toCreateResDto(matchPostRepository.save(matchPost));
     }
 
     // List
     @Transactional(readOnly = true)
-    public List<MatchPostDto.ListResDto> list(Long requestClubId){
-        List<MatchPost> matchPostList = matchPostRepository.findByDeletedAndStatus(false, false);
+    public List<MatchPostDto.ListResDto> list(){
+        List<MatchPost> matchPostList = matchPostRepository.findByDeletedAndStatusOrderByMatchDateDesc(false, false);
 
-        return matchPostList.stream().map(matchPost -> MatchPostDto.ListResDto.toListResDto(matchPost, matchPost.getHomeClub().getId().equals(requestClubId))).toList();
+        return matchPostList.stream().map(MatchPostDto.ListResDto::toListResDto).toList();
+    }
+
+    // MineList
+    @Transactional(readOnly = true)
+    public List<MatchPostDto.ListResDto> mineList(Long requestClubId){
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchPost MineList Error"));
+        List<MatchPost> matchPostList = matchPostRepository.findByHomeClubAndDeletedAndStatusOrderByMatchDateDesc(requestClub, false, false);
+
+        return matchPostList.stream().map(MatchPostDto.ListResDto::toListResDto).toList();
+    }
+
+    // OtherList
+    @Transactional(readOnly = true)
+    public List<MatchPostDto.ListResDto> otherList(Long requestClubId){
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchPost OtherList Error"));
+        List<MatchPost> matchPostList = matchPostRepository.findByHomeClubNotAndDeletedAndStatusOrderByMatchDateDesc(requestClub, false, false);
+
+        return matchPostList.stream().map(MatchPostDto.ListResDto::toListResDto).toList();
     }
 
     // Detail
     @Transactional(readOnly = true)
     public MatchPostDto.DetailResDto detail(Long matchPostId, Long requestClubId){
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost Detail Error"));
-        MatchPostDto.DetailResDto detailResDto = MatchPostDto.DetailResDto.toDetailResDto(matchPost);
-        detailResDto.setMyPost(requestClubId.equals(matchPost.getHomeClub().getId()));
 
-        return detailResDto;
+        return MatchPostDto.DetailResDto.toDetailResDto(matchPost, matchPost.getHomeClub().getId().equals(requestClubId));
     }
 
     // Update
@@ -60,33 +76,33 @@ public class MatchPostService {
             throw new RuntimeException("MatchPost Update Error");
         }
 
-        if(!updateReqDto.getSportCategory().isBlank()){
+        if(StringUtils.hasText(updateReqDto.getSportCategory()) && !updateReqDto.getSportCategory().equals(matchPost.getSportCategory())){
             matchPost.setSportCategory(updateReqDto.getSportCategory());
         }
-        if(updateReqDto.getMatchDate() != null){
+        if(updateReqDto.getMatchDate() != null && !updateReqDto.getMatchDate().equals(matchPost.getMatchDate())){
             matchPost.setMatchDate(updateReqDto.getMatchDate());
         }
-        if(!updateReqDto.getLocation().isBlank()){
+        if(StringUtils.hasText(updateReqDto.getLocation()) && !updateReqDto.getLocation().equals(matchPost.getLocation())){
             matchPost.setLocation(updateReqDto.getLocation());
         }
-        if(updateReqDto.getStartTime() != null){
+        if(updateReqDto.getStartTime() != null && !updateReqDto.getStartTime().equals(matchPost.getStartTime())){
             matchPost.setStartTime(updateReqDto.getStartTime());
         }
-        if(updateReqDto.getEndTime() != null){
+        if(updateReqDto.getEndTime() != null && !updateReqDto.getEndTime().equals(matchPost.getEndTime())){
             matchPost.setEndTime(updateReqDto.getEndTime());
         }
-        if(!updateReqDto.getContent().isBlank()){
+        if(StringUtils.hasText(updateReqDto.getContent()) && !updateReqDto.getContent().equals(matchPost.getContent())){
             matchPost.setContent(updateReqDto.getContent());
         }
 
-        return MatchPostDto.UpdateResDto.builder().matchPostId(matchPost.getId()).build();
+        return MatchPostDto.UpdateResDto.toUpdateResDto(matchPost);
     }
 
     // Delete
     public MatchPostDto.DeleteResDto delete(Long matchPostId, Long requestClubId){
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost Update Error"));
         if(!matchPost.getHomeClub().getId().equals(requestClubId)) {
-            throw new NoPermissionException("MatchPost Update Error");
+            throw new NoPermissionException("MatchPost Delete Error");
         }
 
         matchPostRepository.deleteById(matchPostId);
@@ -141,8 +157,8 @@ public class MatchPostService {
 
         List<MatchPostDto.ListResDto> listResDtoList = new ArrayList<>();
 
-        listResDtoList.addAll(matchPostHomeList.stream().map(matchPost -> MatchPostDto.ListResDto.toHomeListResDto(matchPost,clubId.equals(requestClubId))).toList());
-        listResDtoList.addAll(matchPostAwayList.stream().map(matchPost -> MatchPostDto.ListResDto.toAwayListResDto(matchPost, clubId.equals(requestClubId))).toList());
+        listResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.ListResDto::toHomeListResDto).toList());
+        listResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.ListResDto::toAwayListResDto).toList());
 
         listResDtoList.sort(Comparator.comparing(MatchPostDto.ListResDto::getMatchDate));
 
@@ -191,8 +207,8 @@ public class MatchPostService {
 
         List<MatchPostDto.ListResDto> listResDtoList = new ArrayList<>();
 
-        listResDtoList.addAll(matchPostHomeList.stream().map(matchPost ->MatchPostDto.ListResDto.toHomeListResDto(matchPost, clubId.equals(requestClubId))).toList());
-        listResDtoList.addAll(matchPostAwayList.stream().map(matchPost -> MatchPostDto.ListResDto.toAwayListResDto(matchPost, clubId.equals(requestClubId))).toList());
+        listResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.ListResDto::toHomeListResDto).toList());
+        listResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.ListResDto::toAwayListResDto).toList());
 
         return listResDtoList;
     }
@@ -242,8 +258,8 @@ public class MatchPostService {
         List<MatchPost> matchPostAwayList = matchPostRepository.findByAwayClubAndStatusAndDeleted(club, true, true);
 
         List<MatchPostDto.ListResDto> listResDtoList = new ArrayList<>();
-        listResDtoList.addAll(matchPostHomeList.stream().map(matchPost -> MatchPostDto.ListResDto.toHomeListResDto(matchPost, true)).toList());
-        listResDtoList.addAll(matchPostAwayList.stream().map(matchPost -> MatchPostDto.ListResDto.toAwayListResDto(matchPost, true)).toList());
+        listResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.ListResDto::toHomeListResDto).toList());
+        listResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.ListResDto::toAwayListResDto).toList());
 
         return listResDtoList;
     }

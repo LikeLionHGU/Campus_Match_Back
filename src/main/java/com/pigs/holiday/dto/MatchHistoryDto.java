@@ -74,7 +74,19 @@ public class MatchHistoryDto {
         String result;
 
 
-        public static MatchHistoryDto.ListResDto toListResDto(MatchHistory matchHistory) {
+        public static MatchHistoryDto.ListResDto toHomeResDto(MatchHistory matchHistory) {
+            return builder()
+                    .matchHistoryId(matchHistory.getId())
+                    .matchDate(matchHistory.getMatchDate())
+                    .university(matchHistory.getAwayClub().getUniversity())
+                    .imageUrl(matchHistory.getAwayClub().getImageUrl())
+                    .clubName(matchHistory.getAwayClub().getClubName())
+                    .location(matchHistory.getLocation())
+                    .result(matchHistory.getResult())
+                    .build();
+        }
+
+        public static MatchHistoryDto.ListResDto toAwayResDto(MatchHistory matchHistory) {
             return builder()
                     .matchHistoryId(matchHistory.getId())
                     .matchDate(matchHistory.getMatchDate())
@@ -114,8 +126,12 @@ public class MatchHistoryDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteReqDto {
+    public static class DeleteResDto {
         Long matchHistoryId;
+
+        public static MatchHistoryDto.DeleteResDto toDeleteResDto(MatchHistory matchHistory) {
+            return MatchHistoryDto.DeleteResDto.builder().build();
+        }
     }
 
 }

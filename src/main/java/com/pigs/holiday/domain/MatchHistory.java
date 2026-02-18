@@ -22,7 +22,7 @@ public class MatchHistory extends AuditingFields {
     private Club homeClub;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "away_club_id", nullable = true)
+    @JoinColumn(name = "away_club_id", nullable = false)
     private Club awayClub;
 
     protected MatchHistory(){}
