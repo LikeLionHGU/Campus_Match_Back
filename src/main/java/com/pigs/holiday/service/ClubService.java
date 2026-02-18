@@ -143,5 +143,14 @@ public class ClubService {
         return ClubDto.MannerScoreRes.builder().clubId(clubId).build();
     }
 
+    @Transactional(readOnly = true)
+    public List<ClubDto.SearchRes> searchList(String region, String sportCategory) {
+        List<Club> club = clubRepository.findByDeleted(false).orElseThrow(() -> new EntityNotFoundException("searchList Error"));
+        return club.stream()
+                .filter(c -> region == null || region.isEmpty() || region.contains(c.getRegion()))
+                .filter(c -> sportCategory == null || sportCategory.isEmpty() || sportCategory.contains(c.getSportCategory()))
+                .map(ClubDto.SearchRes :: from)
+                .toList();
+    }
 
 }

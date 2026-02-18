@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -144,4 +145,12 @@ public class MatchPostRestController {
     public ResponseEntity<List<MatchPostDto.ScheduleListResDto>> scheduleList(@PathVariable Long clubId, @RequestParam("matchPostId") Long matchPostId, @AuthenticationPrincipal PrincipalDetails principalDetails){
         return ResponseEntity.ok(matchPostService.scheduleList(clubId, matchPostId));
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("")
+    public ResponseEntity<List<MatchPostDto.SearchResDto>> searchList(@RequestParam(required = false) String region, @RequestParam(required = false) String sportCategory, @RequestParam(required = false) LocalDate matchDate ) {
+        return ResponseEntity.ok(matchPostService.searchList(region, sportCategory, matchDate));
+    }
+
+
 }

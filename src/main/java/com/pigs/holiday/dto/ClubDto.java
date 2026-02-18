@@ -186,6 +186,26 @@ public class ClubDto {
     //검색 페이지 미완
 
 
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public  static class SearchRes {
+        Long clubId;
+        String university;
+        String region;
+        String clubName;
+        String sportCategory;
+        double mannerScore;
+
+        public static SearchRes from(Club club) {
+            return SearchRes.builder()
+                    .clubId(club.getId())
+                    .university(club.getUniversity())
+                    .region(club.getRegion())
+                    .clubName(club.getClubName())
+                    .sportCategory(club.getSportCategory())
+                    .mannerScore(club.getMannerScore())
+                    .build();
+        }
+    }
 
 
 

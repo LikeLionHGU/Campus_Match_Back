@@ -311,4 +311,16 @@ public class MatchPostService {
             throw new RuntimeException("MatchPost ScheduleDetail Error");
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<MatchPostDto.SearchResDto> searchList(String region, String sportCategory, LocalDate matchDate) {
+        List<MatchPost> matchPosts = matchPostRepository.findAllByDeletedFalse();
+
+        return matchPosts.stream()
+                .filter(post -> region == null || region.isBlank() || post.getAwayClub().getRegion().contains(region))
+                .filter(post -> sportCategory == null || sportCategory.isBlank() || post.getAwayClub().getSportCategory().contains(sportCategory))
+                .filter(post -> matchDate == null || post.getMatchDate().equals(matchDate))
+                .map(MatchPostDto.SearchResDto :: from)
+                .toList();
+    }
 }

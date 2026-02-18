@@ -1,7 +1,6 @@
 package com.pigs.holiday.service;
 
 import com.pigs.holiday.domain.Achievement;
-import com.pigs.holiday.domain.AchievementType;
 import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.UserAchievement;
 import com.pigs.holiday.dto.AchievementDto;
@@ -9,11 +8,12 @@ import com.pigs.holiday.repository.AchievementRepository;
 import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.UserAchievementRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -23,78 +23,65 @@ public class AchievementService {
     private final AchievementRepository achievementRepository;
     private final UserAchievementRepository userAchievementRepository;
 
+    @Transactional
     public List<AchievementDto.ListResDto> checkAndAssignAchievements(Long clubId) {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new EntityNotFoundException("클럽을 찾을 수 없습니다."));
 
-
-        int[] commonGoals = {1, 5, 10};
-
-        List<AchievementDto.ListResDto> newAchievements = new ArrayList<>();
-
-        //POST_WRITER
         int postCount = club.getHomeMatchPostList().size() + club.getAwayMatchPostList().size();
-
-        assignAchievementIfEligible(club, AchievementType.POST_WRITER, postCount, commonGoals, newAchievements);
-
-        //MATCH_REQUESTER
         int matchCount = club.getTotalMatches();
-        assignAchievementIfEligible(club, AchievementType.MATCH_REQUESTER, matchCount, commonGoals, newAchievements);
-
-        //MATCH_PARTNER
-        java.util.Map<Long, Integer> opponentCounts = new java.util.HashMap<>();
-
-        club.getHomeMatchHistoryList().forEach(match -> {
-            Long opponentId = match.getAwayClub().getId();
-            opponentCounts.put(opponentId, opponentCounts.getOrDefault(opponentId, 0) + 1);
-        });
-        club.getAwayMatchHistoryList().forEach(match -> {
-            Long opponentId = match.getHomeClub().getId();
-            opponentCounts.put(opponentId, opponentCounts.getOrDefault(opponentId, 0) + 1);
-        });
-
-        int rematchCount = opponentCounts.values().stream()
-                .filter(count -> count > 1)
-                .mapToInt(count -> count - 1)
-                .sum();
-        assignAchievementIfEligible(club, AchievementType.MATCH_PARTNER, rematchCount, commonGoals, newAchievements);
-
-
-        //Ground_Owner
-        int exchangeCount = opponentCounts.size();
-        assignAchievementIfEligible(club, AchievementType.Ground_Owner, exchangeCount, commonGoals, newAchievements);
-
-        //Gentleman
-        int[] mannerGoals = {40, 50, 60};
         double mannerScore = club.getMannerScore();
-        assignAchievementIfEligible(club, AchievementType.Gentleman, mannerScore, mannerGoals, newAchievements);
-
-        //Photogenic
         int photoCount = club.getGalleryList().size();
-        assignAchievementIfEligible(club, AchievementType.Photogenic, photoCount, commonGoals, newAchievements);
 
-        return newAchievements;
-    }
+        Map<Long, Integer> opponentCounts = new HashMap<>();
+        club.getHomeMatchHistoryList().forEach(m -> opponentCounts.merge(m.getAwayClub().getId(), 1, Integer::sum));
+        club.getAwayMatchHistoryList().forEach(m -> opponentCounts.merge(m.getHomeClub().getId(), 1, Integer::sum));
 
-    private void assignAchievementIfEligible(Club club, AchievementType type, double currentCount, int[] goals, List<AchievementDto.ListResDto> unlockedList) {
+        int rematchCount = opponentCounts.values().stream().filter(c -> c > 1).mapToInt(c -> c - 1).sum();
+        int uniqueOpponentCount = opponentCounts.size();
 
-        for (int goal : goals) {
-            if (currentCount >= goal) {
+        List<Achievement> allAchievements = achievementRepository.findAll();
+        List<UserAchievement> myAchievements = userAchievementRepository.findByClub(club);
 
-                Achievement targetAchievement = achievementRepository.findByTypeAndGoalCount(type, goal)
-                        .orElse(null);
+        Set<Long> myAchievementIds = myAchievements.stream()
+                .map(ua -> ua.getAchievement().getId())
+                .collect(Collectors.toSet());
 
-                if (targetAchievement != null) {
+        List<AchievementDto.ListResDto> resultList = new ArrayList<>();
 
-                    boolean alreadyHas = userAchievementRepository.existsByClubAndAchievement(club, targetAchievement);
-                    if (!alreadyHas) {
-                        UserAchievement newAchievement = UserAchievement.of(club, targetAchievement);
-                        userAchievementRepository.save(newAchievement);
-                        unlockedList.add(AchievementDto.ListResDto.from(targetAchievement));
-                    }
+        for (Achievement achievement : allAchievements) {
+            boolean isAcquired = myAchievementIds.contains(achievement.getId());
+
+            if (!isAcquired) {
+                if (checkCondition(achievement, postCount, matchCount, rematchCount, uniqueOpponentCount, mannerScore, photoCount)) {
+                    UserAchievement newUa = UserAchievement.of(club, achievement);
+                    userAchievementRepository.save(newUa);
+                    isAcquired = true; // 이제 딴 상태로 변경
                 }
             }
+
+            resultList.add(AchievementDto.ListResDto.builder()
+                    .id(achievement.getId())
+                    .title(achievement.getTitle())
+                    .imageUrl(achievement.getImageUrl())
+                    .isAcquired(isAcquired)
+                    .build());
         }
+
+        return resultList;
+    }
+
+    private boolean checkCondition(Achievement achievement, int postCount, int matchCount, int rematchCount,
+                                   int uniqueOpponentCount, double mannerScore, int photoCount) {
+        int goal = achievement.getGoalCount();
+        return switch (achievement.getType()) {
+            case POST_WRITER -> postCount >= goal;
+            case MATCH_REQUESTER -> matchCount >= goal;
+            case MATCH_PARTNER -> rematchCount >= goal;
+            case Ground_Owner -> uniqueOpponentCount >= goal;
+            case Gentleman -> mannerScore >= goal;
+            case Photogenic -> photoCount >= goal;
+        };
     }
 
 

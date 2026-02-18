@@ -330,4 +330,32 @@ public class MatchPostDto {
                     .build();
         }
     }
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class SearchResDto {
+        Long matchPostId;
+        Long clubId;
+        String region;
+        String sportCategory;
+        LocalDate matchDate;
+        String location;
+        String clubName;
+        String university;
+        double mannerScore;
+        Boolean myPost;
+
+        public static SearchResDto from(MatchPost matchPost) {
+            return SearchResDto.builder()
+                    .matchPostId(matchPost.getId())
+                    .clubId(matchPost.getHomeClub().getId())
+                    .region(matchPost.getHomeClub().getRegion())
+                    .sportCategory(matchPost.getSportCategory())
+                    .matchDate(matchPost.getMatchDate())
+                    .location(matchPost.getLocation())
+                    .clubName(matchPost.getHomeClub().getClubName())
+                    .university(matchPost.getHomeClub().getUniversity())
+                    .mannerScore(matchPost.getHomeClub().getMannerScore())
+                    .myPost(matchPost.getStatus())
+                    .build();
+        }
+    }
 }

@@ -102,4 +102,10 @@ public class ClubRestController {
         return ResponseEntity.ok(clubService.manner(mannerScoreReq,clubId));
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("")
+    public ResponseEntity<List<ClubDto.SearchRes>> searchList(@RequestParam(required = false)String region, @RequestParam(required = false)String sportCategory) {
+        return ResponseEntity.ok(clubService.searchList(region, sportCategory));
+    }
+
 }
