@@ -37,8 +37,22 @@ public class MatchPostRestController {
     // List
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
-    public ResponseEntity<List<MatchPostDto.ListResDto>> list(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchPostService.list(getReqUserId(principalDetails)));
+    public ResponseEntity<List<MatchPostDto.ListResDto>> list(){
+        return ResponseEntity.ok(matchPostService.list());
+    }
+
+    // MineList
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/mine")
+    public ResponseEntity<List<MatchPostDto.ListResDto>> mineList(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchPostService.mineList(getReqUserId(principalDetails)));
+    }
+
+    // OtherList
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/mine")
+    public ResponseEntity<List<MatchPostDto.ListResDto>> otherList(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchPostService.otherList(getReqUserId(principalDetails)));
     }
 
     // Detail

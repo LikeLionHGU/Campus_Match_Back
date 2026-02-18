@@ -1,6 +1,8 @@
 package com.pigs.holiday.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pigs.holiday.domain.Club;
+import com.pigs.holiday.domain.MatchPost;
 import com.pigs.holiday.domain.MatchRequest;
 import lombok.*;
 
@@ -12,14 +14,13 @@ public class MatchRequestDto {
     // Create Request Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto {
-        Long senderClubId;
         @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
         @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
 
-        public MatchRequest toEntity() {
-            return MatchRequest.of(startTime, endTime, null, null);
+        public MatchRequest toEntity(MatchPost matchPost, Club Request) {
+            return MatchRequest.of(startTime, endTime, matchPost, Request);
         }
     }
 
@@ -66,46 +67,46 @@ public class MatchRequestDto {
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class ListResDto {
         Long matchRequestId;
-        String region;
-        String sportCategory;
         LocalDate matchDate;
-        String location;
+        String sportCategory;
         Long clubId;
         String imageUrl;
         String clubName;
         String university;
+        String region;
+        String location;
         double mannerScore;
-        Boolean myRequest;
+        Boolean isMine;
 
-        public static ListResDto toReceiveListResDto(MatchRequest matchRequest, Boolean myRequest) {
+        public static ListResDto toReceiveListResDto(MatchRequest matchRequest, Boolean isMine) {
             return builder()
                     .matchRequestId(matchRequest.getId())
-                    .region(matchRequest.getMatchPost().getHomeClub().getRegion())
-                    .sportCategory(matchRequest.getMatchPost().getSportCategory())
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
-                    .location(matchRequest.getMatchPost().getLocation())
+                    .sportCategory(matchRequest.getMatchPost().getSportCategory())
                     .clubId(matchRequest.getSenderClub().getId())
                     .imageUrl(matchRequest.getSenderClub().getImageUrl())
-                    .clubName(matchRequest.getSenderClub().getClubName())
+                    .clubName(matchRequest.getSenderClub().getName())
                     .university(matchRequest.getSenderClub().getUniversity())
+                    .region(matchRequest.getSenderClub().getRegion())
+                    .location(matchRequest.getMatchPost().getLocation())
                     .mannerScore(matchRequest.getSenderClub().getMannerScore())
-                    .myRequest(myRequest)
+                    .isMine(isMine)
                     .build();
         }
 
-        public static ListResDto toSendListResDto(MatchRequest matchRequest, Boolean myRequest) {
+        public static ListResDto toSendListResDto(MatchRequest matchRequest, Boolean isMine) {
             return builder()
                     .matchRequestId(matchRequest.getId())
-                    .region(matchRequest.getMatchPost().getHomeClub().getRegion())
-                    .sportCategory(matchRequest.getMatchPost().getSportCategory())
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
-                    .location(matchRequest.getMatchPost().getLocation())
+                    .sportCategory(matchRequest.getMatchPost().getSportCategory())
                     .clubId(matchRequest.getMatchPost().getHomeClub().getId())
                     .imageUrl(matchRequest.getMatchPost().getHomeClub().getImageUrl())
-                    .clubName(matchRequest.getMatchPost().getHomeClub().getClubName())
+                    .clubName(matchRequest.getMatchPost().getHomeClub().getName())
                     .university(matchRequest.getMatchPost().getHomeClub().getUniversity())
+                    .region(matchRequest.getMatchPost().getHomeClub().getRegion())
+                    .location(matchRequest.getMatchPost().getLocation())
                     .mannerScore(matchRequest.getMatchPost().getHomeClub().getMannerScore())
-                    .myRequest(myRequest)
+                    .isMine(isMine)
                     .build();
         }
     }

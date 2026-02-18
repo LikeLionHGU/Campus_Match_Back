@@ -4,6 +4,7 @@ package com.pigs.holiday.service;
 import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.MatchHistory;
 import com.pigs.holiday.dto.MatchHistoryDto;
+import com.pigs.holiday.exception.NoPermissionException;
 import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.MatchHistoryRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -37,10 +38,16 @@ public class MatchHistoryService {
 
     @Transactional(readOnly = true)
     public List<MatchHistoryDto.ListResDto> list(Long clubId) {
-        List<MatchHistory> matchesHistory = matchHistoryRepository.findByClubId(clubId);
-        return matchesHistory.stream()
-                .map(MatchHistoryDto.ListResDto::toListResDto)
-                .toList();
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchHistory List Error"));
+        List<MatchHistory> homeClubList = matchHistoryRepository.findByHomeClub(club);
+        List<MatchHistory> awayClubList = matchHistoryRepository.findByAwayClub(club);
+
+        List<MatchHistoryDto.ListResDto> resDtoList = new ArrayList<>();
+
+        resDtoList.addAll(homeClubList.stream().map(MatchHistoryDto.ListResDto::toHomeResDto).toList());
+        resDtoList.addAll(awayClubList.stream().map(MatchHistoryDto.ListResDto::toAwayResDto).toList());
+
+        return resDtoList;
     }
 
     @Transactional
@@ -73,14 +80,16 @@ public class MatchHistoryService {
                 .build();
     }
 
-    public void delete(Long matchHistoryId, Long clubId) {
-        MatchHistory matchHistory = matchHistoryRepository.findById(matchHistoryId)
-                .orElseThrow(() -> new EntityNotFoundException("History Delete Error"));
+    public MatchHistoryDto.DeleteResDto delete(Long matchHistoryId, Long clubId) {
+        MatchHistory matchHistory = matchHistoryRepository.findById(matchHistoryId).orElseThrow(() -> new EntityNotFoundException("History Delete Error"));
 
-        if (!matchHistory.getHomeClub().getId().equals(clubId)) {
-            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+        if(matchHistory.getHomeClub().getId().equals(clubId)||matchHistory.getAwayClub().getId().equals(clubId)) {
+            matchHistoryRepository.delete(matchHistory);
+        }else{
+            throw new NoPermissionException("History Delete Error");
         }
-        matchHistory.setDeleted(true);
+
+        return MatchHistoryDto.DeleteResDto.toDeleteResDto(matchHistory);
     }
 
 }

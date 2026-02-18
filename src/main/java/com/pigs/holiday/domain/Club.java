@@ -59,7 +59,7 @@ public class Club extends AuditingFields {
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAchievement> userAchievements = new ArrayList<>();
 
-    @OneToMany(mappedBy = "club")
+    @OneToMany(mappedBy = "receiveClub")
     private List<Notification> notificationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "awayClub")

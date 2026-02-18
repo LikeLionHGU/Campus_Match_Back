@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface MatchPostRepository extends JpaRepository<MatchPost, Long> {
-    List<MatchPost> findByDeletedAndStatus(Boolean deleted, Boolean status);
     List<MatchPost> findByHomeClubAndDeletedAndStatusAndMatchDateGreaterThan(Club homeClub, Boolean Deleted, Boolean status, LocalDate targetDate);
     List<MatchPost> findByAwayClubAndDeletedAndStatusAndMatchDateGreaterThan(Club awayClub, Boolean Deleted, Boolean status, LocalDate targetDate);
     List<MatchPost> findByHomeClubAndDeletedAndStatusAndMatchDate(Club homeClub, Boolean Deleted, Boolean status, LocalDate matchDate);
@@ -25,4 +24,9 @@ public interface MatchPostRepository extends JpaRepository<MatchPost, Long> {
     List<MatchPost> findByAwayClubAndDeleted(Club awayClub, Boolean deleted);
 
     List<MatchPost> findAllByDeletedFalse();
+    List<MatchPost> findByDeletedAndStatusOrderByMatchDateDesc(Boolean deleted, Boolean status);
+
+    List<MatchPost> findByHomeClubAndDeletedAndStatusOrderByMatchDateDesc(Club homeClub, Boolean deleted, Boolean status);
+
+    List<MatchPost> findByHomeClubNotAndDeletedAndStatusOrderByMatchDateDesc(Club homeClub, Boolean deleted, Boolean status);
 }

@@ -30,14 +30,12 @@ public class MatchRequestService {
 
     // Create
     public MatchRequestDto.CreateResDto create(Long matchPostId, MatchRequestDto.CreateReqDto createReqDto, Long requestClubId){
-        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest Create Error"));
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchRequest Create Error"));
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchRequest Create Error"));
-        MatchRequest matchRequest = createReqDto.toEntity();
-        matchRequest.setSenderClub(club);
-        matchRequest.setMatchPost(matchPost);
+        MatchRequest matchRequest = createReqDto.toEntity(matchPost, requestClub);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("receive", today, "", false, matchPost.getHomeClub(), club);
+        Notification notification = Notification.of("receive", today, "", false, matchPost.getHomeClub(), requestClub);
         notificationRepository.save(notification);
 
         return MatchRequestDto.CreateResDto.toCreateResDto(matchRequestRepository.save(matchRequest));
