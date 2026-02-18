@@ -23,4 +23,6 @@ public interface MatchPostRepository extends JpaRepository<MatchPost, Long> {
     List<MatchPost> findByHomeClubAndDeletedAndStatus(Club homeClub, Boolean deleted, Boolean status);
 
     List<MatchPost> findByAwayClubAndDeleted(Club awayClub, Boolean deleted);
+
+    List<MatchPost> findAllByDeletedFalse();
 }
