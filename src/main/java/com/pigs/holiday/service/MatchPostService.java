@@ -295,4 +295,10 @@ public class MatchPostService {
             throw new RuntimeException("MatchPost ScheduleDetail Error");
         }
     }
+//
+//    @Transactional(readOnly = true)
+//    public List<MatchPostDto.SearchResDto> searchList(String region, String sportCategory, LocalDate matchDate) {
+//        Club club = clubRepository.findByDeleted(false).orElseThrow(() -> new EntityNotFoundException("matchPost searchList Error"))
+//        MatchPost matchPost = matchPostRepository.findByAwayClubAndDeletedAndStatusAndMatchDate()
+//    }
 }
