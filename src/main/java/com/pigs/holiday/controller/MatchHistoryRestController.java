@@ -25,9 +25,9 @@ public class MatchHistoryRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("")
-    public ResponseEntity<List<MatchHistoryDto.ListResDto>> list(@RequestParam MatchHistoryDto.ListReqDto listReqDto) {
-        return ResponseEntity.ok(matchHistoryService.list(listReqDto.getClubId()));
+    @GetMapping("/{clubId}")
+    public ResponseEntity<List<MatchHistoryDto.ListResDto>> list(@PathVariable Long clubId) {
+        return ResponseEntity.ok(matchHistoryService.list(clubId));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -37,10 +37,9 @@ public class MatchHistoryRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @DeleteMapping("")
-    public ResponseEntity<Void> delete(@RequestBody MatchHistoryDto.DeleteReqDto deleteReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails ){
-        matchHistoryService.delete(deleteReqDto.getMatchHistoryId(), principalDetails.getClub().getId());
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{matchHistoryId}")
+    public ResponseEntity<MatchHistoryDto.DeleteResDto> delete(@PathVariable Long matchHistoryId, @AuthenticationPrincipal PrincipalDetails principalDetails ){
+        return ResponseEntity.ok(matchHistoryService.delete(matchHistoryId, principalDetails.getClub().getId()));
     }
 
 }
