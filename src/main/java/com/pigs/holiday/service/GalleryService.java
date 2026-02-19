@@ -46,7 +46,7 @@ public class GalleryService {
     @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> list(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery List Error"));
-        List<Gallery> galleryList = galleryRepository.findByClub(club);
+        List<Gallery> galleryList = galleryRepository.findByClubAndDeleted(club, false);
 
         return galleryList.stream().map(GalleryDto.ListResDto::toListResDto).toList();
     }
@@ -55,7 +55,7 @@ public class GalleryService {
     @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> matchList(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery MyClubList Error"));
-        List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficial(club, true);
+        List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficialAndDeleted(club, true, false);
 
         return galleryList.stream().map(GalleryDto.ListResDto::toListResDto).toList();
     }
@@ -64,7 +64,7 @@ public class GalleryService {
     @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> myClubList(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery MyClubList Error"));
-        List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficial(club, false);
+        List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficialAndDeleted(club, false, false);
 
         return galleryList.stream().map(GalleryDto.ListResDto::toListResDto).toList();
     }
@@ -120,15 +120,15 @@ public class GalleryService {
     }
 
     // Delete
+    @Transactional
     public GalleryDto.DeleteResDto delete(Long galleryId, Long requestClubId) {
-        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Delete Error"));
         Gallery gallery = galleryRepository.findById(galleryId).orElseThrow(() -> new EntityNotFoundException("Gallery Delete Error"));
 
-        if(!gallery.getClub().equals(club)) {
+        if(!gallery.getClub().getId().equals(requestClubId)) {
             throw new NoPermissionException("Gallery Delete Error");
         }
 
-        galleryRepository.delete(gallery);
+        gallery.setDeleted(true);
 
         return GalleryDto.DeleteResDto.toDeleteResDto(gallery);
     }

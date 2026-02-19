@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class MatchPostDto {
 
@@ -20,6 +21,7 @@ public class MatchPostDto {
         String sportCategory;
         LocalDate matchDate;
         String location;
+        String locationDetail;
         @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
         @JsonFormat(pattern = "HH:mm")
@@ -27,7 +29,7 @@ public class MatchPostDto {
         String content;
 
         public MatchPost toEntity(Club requestClub) {
-            return MatchPost.of(getSportCategory(), getMatchDate(), getLocation(), getStartTime(), getEndTime(), getContent(), false, requestClub, null);
+            return MatchPost.of(getSportCategory(), getMatchDate(), getLocation(), getLocationDetail(), getStartTime(), getEndTime(), getContent(), false, requestClub, null);
         }
     }
 
@@ -47,6 +49,16 @@ public class MatchPostDto {
         }
     }
 
+    // List Request Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class ListReqDto {
+        List<String> sportCategoryList;
+        List<String> regionList;
+        LocalDate startDate;
+        LocalDate endDate;
+        String keyword;
+    }
+
     // List Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class ListResDto {
@@ -60,21 +72,6 @@ public class MatchPostDto {
         String region;
         String location;
         double mannerScore;
-
-        public static ListResDto toListResDto(MatchPost matchPost) {
-            return builder()
-                    .matchPostId(matchPost.getId())
-                    .matchDate(matchPost.getMatchDate())
-                    .sportCategory(matchPost.getSportCategory())
-                    .clubId(matchPost.getHomeClub().getId())
-                    .imageUrl(matchPost.getHomeClub().getImageUrl())
-                    .clubName(matchPost.getHomeClub().getName())
-                    .university(matchPost.getHomeClub().getUniversity())
-                    .region(matchPost.getHomeClub().getRegion())
-                    .location(matchPost.getLocation())
-                    .mannerScore(matchPost.getHomeClub().getMannerScore())
-                    .build();
-        }
 
         public static ListResDto toHomeListResDto(MatchPost matchPost) {
             return builder()
@@ -111,6 +108,7 @@ public class MatchPostDto {
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class DetailResDto {
         String location;
+        String locationDetail;
         @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
         @JsonFormat(pattern = "HH:mm")
@@ -122,6 +120,7 @@ public class MatchPostDto {
         public static DetailResDto toDetailResDto(MatchPost matchPost, Boolean isMine) {
             return builder()
                     .location(matchPost.getLocation())
+                    .locationDetail(matchPost.getLocationDetail())
                     .startTime(matchPost.getStartTime())
                     .endTime(matchPost.getEndTime())
                     .phone(matchPost.getHomeClub().getPhone())
@@ -137,6 +136,7 @@ public class MatchPostDto {
         String sportCategory;
         LocalDate matchDate;
         String location;
+        String locationDetail;
         @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
         @JsonFormat(pattern = "HH:mm")
@@ -194,6 +194,7 @@ public class MatchPostDto {
         LocalTime startTime;
         LocalTime endTime;
         String location;
+        String locationDetail;
         String phone;
         String content;
 
@@ -203,6 +204,7 @@ public class MatchPostDto {
                     .startTime(matchPost.getStartTime())
                     .endTime(matchPost.getEndTime())
                     .location(matchPost.getLocation())
+                    .locationDetail(matchPost.getLocationDetail())
                     .phone(matchPost.getAwayClub().getPhone())
                     .content(matchPost.getContent())
                     .build();
@@ -214,6 +216,7 @@ public class MatchPostDto {
                     .startTime(matchPost.getStartTime())
                     .endTime(matchPost.getEndTime())
                     .location(matchPost.getLocation())
+                    .locationDetail(matchPost.getLocationDetail())
                     .phone(matchPost.getHomeClub().getPhone())
                     .content(matchPost.getContent())
                     .build();
@@ -233,6 +236,7 @@ public class MatchPostDto {
         Long oppositionClubId;
         LocalDate matchDate;
         String location;
+        String locationDetail;
 
         public static FinishDetailResDto toFinishHomeDetailResDto(MatchPost matchPost) {
             return builder()
@@ -240,6 +244,7 @@ public class MatchPostDto {
                     .oppositionClubId(matchPost.getAwayClub().getId())
                     .matchDate(matchPost.getMatchDate())
                     .location(matchPost.getLocation())
+                    .locationDetail(matchPost.getLocationDetail())
                     .build();
         }
 
@@ -249,36 +254,34 @@ public class MatchPostDto {
                     .oppositionClubId(matchPost.getHomeClub().getId())
                     .matchDate(matchPost.getMatchDate())
                     .location(matchPost.getLocation())
+                    .locationDetail(matchPost.getLocationDetail())
                     .build();
         }
     }
 
-    // scheduleList Response Dto
+    // schedule Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class ScheduleListResDto {
+    public static class ScheduleResDto {
         Long matchPostId;
         LocalDate matchDate;
-        Long clubId;
         String university;
         String clubName;
         Boolean status;
 
-        public static ScheduleListResDto toScheduleHomeListDto(MatchPost matchPost) {
+        public static ScheduleResDto toHomeResDto(MatchPost matchPost) {
             return builder()
                     .matchPostId(matchPost.getId())
                     .matchDate(matchPost.getMatchDate())
-                    .clubId(matchPost.getAwayClub().getId())
                     .university(matchPost.getAwayClub().getUniversity())
                     .clubName(matchPost.getAwayClub().getClubName())
                     .status(matchPost.getStatus())
                     .build();
         }
 
-        public static ScheduleListResDto toScheduleAwayListDto(MatchPost matchPost) {
+        public static ScheduleResDto toAwayResDto(MatchPost matchPost) {
             return builder()
                     .matchPostId(matchPost.getId())
                     .matchDate(matchPost.getMatchDate())
-                    .clubId(matchPost.getHomeClub().getId())
                     .university(matchPost.getHomeClub().getUniversity())
                     .clubName(matchPost.getHomeClub().getClubName())
                     .status(matchPost.getStatus())
@@ -287,74 +290,56 @@ public class MatchPostDto {
     }
 
 
+    // Schedule Detail Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class ScheduleDetailResDto {
+        Long matchPostId;
         String sportCategory;
         LocalDate matchDate;
         LocalTime startTime;
         LocalTime endTime;
         String location;
+        String locationDetail;
         String university;
         String clubName;
         String phone;
         String content;
         Boolean status;
+        Boolean isMine;
 
-        public static ScheduleDetailResDto toScheduleHomeDetailDto(MatchPost matchPost) {
+        public static ScheduleDetailResDto toScheduleHomeDetailDto(MatchPost matchPost, Boolean isMine) {
             return builder()
+                    .matchPostId(matchPost.getId())
                     .sportCategory(matchPost.getSportCategory())
                     .matchDate(matchPost.getMatchDate())
                     .startTime(matchPost.getStartTime())
                     .endTime(matchPost.getEndTime())
                     .location(matchPost.getLocation())
+                    .locationDetail(matchPost.getLocationDetail())
                     .university(matchPost.getAwayClub().getUniversity())
                     .clubName(matchPost.getAwayClub().getClubName())
                     .phone(matchPost.getAwayClub().getPhone())
                     .content(matchPost.getContent())
                     .status(matchPost.getStatus())
+                    .isMine(isMine)
                     .build();
         }
 
-        public static ScheduleDetailResDto toScheduleAwayDetailDto(MatchPost matchPost) {
+        public static ScheduleDetailResDto toScheduleAwayDetailDto(MatchPost matchPost, Boolean isMine) {
             return builder()
+                    .matchPostId(matchPost.getId())
                     .sportCategory(matchPost.getSportCategory())
                     .matchDate(matchPost.getMatchDate())
                     .startTime(matchPost.getStartTime())
                     .endTime(matchPost.getEndTime())
                     .location(matchPost.getLocation())
+                    .locationDetail(matchPost.getLocationDetail())
                     .university(matchPost.getHomeClub().getUniversity())
                     .clubName(matchPost.getHomeClub().getClubName())
                     .phone(matchPost.getHomeClub().getPhone())
                     .content(matchPost.getContent())
                     .status(matchPost.getStatus())
-                    .build();
-        }
-    }
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class SearchResDto {
-        Long matchPostId;
-        Long clubId;
-        String region;
-        String sportCategory;
-        LocalDate matchDate;
-        String location;
-        String clubName;
-        String university;
-        double mannerScore;
-        Boolean myPost;
-
-        public static SearchResDto from(MatchPost matchPost) {
-            return SearchResDto.builder()
-                    .matchPostId(matchPost.getId())
-                    .clubId(matchPost.getHomeClub().getId())
-                    .region(matchPost.getHomeClub().getRegion())
-                    .sportCategory(matchPost.getSportCategory())
-                    .matchDate(matchPost.getMatchDate())
-                    .location(matchPost.getLocation())
-                    .clubName(matchPost.getHomeClub().getClubName())
-                    .university(matchPost.getHomeClub().getUniversity())
-                    .mannerScore(matchPost.getHomeClub().getMannerScore())
-                    .myPost(matchPost.getStatus())
+                    .isMine(isMine)
                     .build();
         }
     }
