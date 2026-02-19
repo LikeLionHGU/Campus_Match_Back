@@ -16,12 +16,20 @@ import java.util.List;
 @RestController
 public class MatchHistoryRestController {
 
+    public Long getReqUserId(PrincipalDetails principalDetails) {
+        if(principalDetails == null || principalDetails.getUser() == null || principalDetails.getUser().getId() == null) {
+            return null;
+        }
+
+        return principalDetails.getUser().getId();
+    }
+
     final MatchHistoryService matchHistoryService;
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("") // URL 경로 변수 없음
-    public ResponseEntity<MatchHistoryDto.CreateResDto> create(@RequestBody MatchHistoryDto.CreateReqDto createReqDto) {
-        return ResponseEntity.ok(matchHistoryService.create(createReqDto, createReqDto.getClubId()));
+    @PostMapping("")
+    public ResponseEntity<MatchHistoryDto.CreateResDto> create(@RequestBody MatchHistoryDto.CreateReqDto createReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(matchHistoryService.create(createReqDto, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")

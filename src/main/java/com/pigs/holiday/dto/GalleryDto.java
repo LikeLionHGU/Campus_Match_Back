@@ -1,5 +1,6 @@
 package com.pigs.holiday.dto;
 
+import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.Gallery;
 import com.pigs.holiday.domain.GalleryImage;
 import lombok.*;
@@ -14,9 +15,8 @@ public class GalleryDto {
     public static class CreateReqDto {
         String title;
         LocalDate matchDate;
-        Boolean isOfficial;
 
-        public Gallery toEntity() { return Gallery.of(getMatchDate(), getTitle(), getIsOfficial(),null); }
+        public Gallery toEntity(Club club) { return Gallery.of(getMatchDate(), getTitle(), false,club); }
     }
 
     // Create Response Dto
@@ -29,7 +29,13 @@ public class GalleryDto {
         }
     }
 
-    // List
+    // List Request Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class ListReqDto {
+        String keyword;
+    }
+
+    // List Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class ListResDto {
         Long galleryId;
@@ -37,16 +43,6 @@ public class GalleryDto {
         LocalDate matchDate;
         String imageUrl;
         Boolean isOfficial;
-
-        public static ListResDto toListResDto(Gallery gallery) {
-            return builder()
-                    .galleryId(gallery.getId())
-                    .title(gallery.getTitle())
-                    .matchDate(gallery.getMatchDate())
-                    .imageUrl(gallery.getGalleryImageList().get(0).getImageUrl())
-                    .isOfficial(gallery.getIsOfficial())
-                    .build();
-        }
     }
 
     // Detail
@@ -55,15 +51,15 @@ public class GalleryDto {
         String title;
         LocalDate matchDate;
         Boolean isOfficial;
-        Boolean myGallery;
+        Boolean isMine;
         List<String> imageUrls;
 
-        public static DetailResDto toDetailResDto(Gallery gallery, Boolean myGallery) {
+        public static DetailResDto toDetailResDto(Gallery gallery, Boolean isMine) {
             return builder()
                     .title(gallery.getTitle())
                     .matchDate(gallery.getMatchDate())
                     .isOfficial(gallery.getIsOfficial())
-                    .myGallery(myGallery)
+                    .isMine(isMine)
                     .imageUrls(gallery.getGalleryImageList().stream().map(GalleryImage::getImageUrl).toList())
                     .build();
         }

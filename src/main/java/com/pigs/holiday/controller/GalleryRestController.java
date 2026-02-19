@@ -1,7 +1,9 @@
 package com.pigs.holiday.controller;
 
+import com.pigs.holiday.dto.ClubDto;
 import com.pigs.holiday.dto.GalleryDto;
 import com.pigs.holiday.security.PrincipalDetails;
+import com.pigs.holiday.service.ClubService;
 import com.pigs.holiday.service.FileService;
 import com.pigs.holiday.service.GalleryService;
 import lombok.RequiredArgsConstructor;
@@ -42,23 +44,23 @@ public class GalleryRestController {
 
     // List
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/{clubId}")
-    public ResponseEntity<List<GalleryDto.ListResDto>> list(@PathVariable Long clubId) {
-        return ResponseEntity.ok(galleryService.list(clubId));
+    @PostMapping("/{clubId}")
+    public ResponseEntity<List<GalleryDto.ListResDto>> list(@PathVariable Long clubId, @RequestBody GalleryDto.ListReqDto listReqDto) {
+        return ResponseEntity.ok(galleryService.list(clubId, listReqDto));
     }
 
     // MatchList
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/match/{clubId}")
-    public ResponseEntity<List<GalleryDto.ListResDto>> matchList(@PathVariable Long clubId) {
-        return ResponseEntity.ok(galleryService.matchList(clubId));
+    @PostMapping("/match/{clubId}")
+    public ResponseEntity<List<GalleryDto.ListResDto>> matchList(@PathVariable Long clubId, @RequestBody GalleryDto.ListReqDto listReqDto) {
+        return ResponseEntity.ok(galleryService.matchList(clubId, listReqDto));
     }
 
     // MyClubList
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/myClub/{clubId}")
-    public ResponseEntity<List<GalleryDto.ListResDto>> myClubList(@PathVariable Long clubId) {
-        return ResponseEntity.ok(galleryService.myClubList(clubId));
+    @PostMapping("/myClub/{clubId}")
+    public ResponseEntity<List<GalleryDto.ListResDto>> myClubList(@PathVariable Long clubId, @RequestBody GalleryDto.ListReqDto listReqDto) {
+        return ResponseEntity.ok(galleryService.myClubList(clubId, listReqDto));
     }
 
     // Detail

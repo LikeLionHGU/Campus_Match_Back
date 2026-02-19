@@ -107,6 +107,8 @@ public class MatchPostDto {
     // Detail Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class DetailResDto {
+        String sportCategory;
+        LocalDate matchDate;
         String location;
         String locationDetail;
         @JsonFormat(pattern = "HH:mm")
@@ -119,6 +121,8 @@ public class MatchPostDto {
 
         public static DetailResDto toDetailResDto(MatchPost matchPost, Boolean isMine) {
             return builder()
+                    .sportCategory(matchPost.getSportCategory())
+                    .matchDate(matchPost.getMatchDate())
                     .location(matchPost.getLocation())
                     .locationDetail(matchPost.getLocationDetail())
                     .startTime(matchPost.getStartTime())

@@ -23,8 +23,8 @@ public class MatchHistoryService {
     final ClubRepository clubRepository;
     final MatchHistoryRepository matchHistoryRepository;
 
-    public MatchHistoryDto.CreateResDto create(MatchHistoryDto.CreateReqDto createReqDto, Long clubId) {
-        Club homeClub = clubRepository.findById(clubId)
+    public MatchHistoryDto.CreateResDto create(MatchHistoryDto.CreateReqDto createReqDto, Long requestClubId) {
+        Club homeClub = clubRepository.findById(requestClubId)
                 .orElseThrow(() -> new EntityNotFoundException("Home Club Not Found"));
 
         Club awayClub = clubRepository.findById(createReqDto.getOppositionClubId())

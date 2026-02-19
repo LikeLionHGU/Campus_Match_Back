@@ -13,4 +13,6 @@ public interface MatchRequestRepository extends JpaRepository<MatchRequest, Long
     List<MatchRequest> findBySenderClub(Club senderClub);
 
     void deleteByMatchPost(MatchPost matchPost);
+
+    List<MatchRequest> findBySenderClubAndDeleted(Club senderClub, Boolean deleted);
 }

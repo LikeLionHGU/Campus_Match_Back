@@ -81,7 +81,7 @@ public class ClubDto {
         public static DashboardResDto toDashboardResDto(Club club) {
             return builder()
                     .clubId(club.getId())
-                    .clubName(club.getName())
+                    .clubName(club.getClubName())
                     .description(club.getDescription())
                     .totalMatches(club.getTotalMatches())
                     .totalWins(club.getTotalWins())

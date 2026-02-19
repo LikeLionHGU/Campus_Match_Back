@@ -107,6 +107,16 @@ public class NotificationDto {
                     .build();
         }
 
+        public static DetailResDto toReceiveCancelDetailResDto(Notification notification) {
+            return builder()
+                    .notificationId(notification.getId())
+                    .notiType(notification.getNotiType())
+                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubUniversity(notification.getAwayClub().getUniversity())
+                    .content(notification.getContent())
+                    .build();
+        }
+
         public static DetailResDto toFinishDetailResDto(Notification notification) {
             return builder()
                     .notificationId(notification.getId())
