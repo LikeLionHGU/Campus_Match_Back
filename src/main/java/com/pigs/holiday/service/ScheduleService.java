@@ -12,7 +12,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,38 +27,39 @@ public class ScheduleService {
     final ClubRepository clubRepository;
     final NotificationRepository notificationRepository;
 
-    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long clubId){
+    final MatchPostService matchPostService;
+
+    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("schedule Create Error"));
         Schedule schedule = createReqDto.toEntity(club);
         schedule.setClub(club);
 
-//        LocalDate today = LocalDate.now();
-//        Notification notification = Notification.of("schedule", today, schedule.getTitle(), false, club, null);
-//        notificationRepository.save(notification);
+        LocalDate today = LocalDate.now();
+        Notification notification = Notification.of("schedule", today, schedule.getTitle(), false, club, null, schedule);
+        notificationRepository.save(notification);
 
         return ScheduleDto.CreateResDto.toCreateResDto(scheduleRepository.save(schedule));
     }
 
-    //여기 고쳐야함 씨부럴
     @Transactional(readOnly = true)
-    public List<ScheduleDto.ListResDto> list(Long clubId) {
-        List<Schedule> schedulesList = scheduleRepository.findByClubIdAndDeleted(clubId, false);
+    public ScheduleDto.CalendarResDto list(Long clubId, Long requestClubId) {
+        ScheduleDto.CalendarResDto calendarResDto = ScheduleDto.CalendarResDto.toCalendarResDto(clubId.equals(requestClubId));
+        if(calendarResDto.getIsMine()){
+            calendarResDto.setScheduleResDtoList(scheduleRepository.findByClubIdAndDeleted(clubId, false).stream().map(ScheduleDto.ScheduleResDto::toScheduleResDto).collect(Collectors.toList()));
+        }
+        calendarResDto.setMatchPostResDtoList(matchPostService.scheduleList(clubId, requestClubId));
 
-        return schedulesList.stream()
-                .map(ScheduleDto.ListResDto::from)
-                .collect(Collectors.toList());
+        return calendarResDto;
     }
 
     @Transactional(readOnly = true)
-    public ScheduleDto.DetailResDto detail(Long ScheduleId, Long clubId){
+    public ScheduleDto.DetailResDto detail(Long ScheduleId) {
         Schedule schedule = scheduleRepository.findById(ScheduleId).orElseThrow(() -> new EntityNotFoundException("schedule Detail Error"));
-        ScheduleDto.DetailResDto detailResDto = ScheduleDto.DetailResDto.toDetailResDto(schedule);
-        detailResDto.setMyClub(clubId.equals(schedule.getClub().getId()));
-        return detailResDto;
+        return ScheduleDto.DetailResDto.toDetailResDto(schedule);
     }
 
     @Transactional
-    public ScheduleDto.UpdateResDto update(ScheduleDto.UpdateReqDto reqDto, Long scheduleId, Long requestClubId) { // reqDto 필수!
+    public ScheduleDto.UpdateResDto update(ScheduleDto.UpdateReqDto reqDto, Long scheduleId, Long requestClubId) {
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException("Schedule Update Error"));
@@ -65,7 +68,7 @@ public class ScheduleService {
             throw new NoPermissionException("Schedule Update Error");
         }
 
-        if (reqDto.getTitle() != null && !reqDto.getTitle().isBlank()) {
+        if (StringUtils.hasText(reqDto.getTitle()) && !reqDto.getTitle().equals(schedule.getTitle())) {
             schedule.setTitle(reqDto.getTitle());
         }
         if (reqDto.getStartDate() != null) {
@@ -81,14 +84,20 @@ public class ScheduleService {
             schedule.setEndTime(reqDto.getEndTime());
         }
 
-        return ScheduleDto.UpdateResDto.builder().reqId(scheduleId).build();
+        return ScheduleDto.UpdateResDto.toUpdateResDto(schedule);
     }
 
     @Transactional
-    public ScheduleDto.DeleteResDto delete(Long scheduleId) {
+    public ScheduleDto.DeleteResDto delete(Long scheduleId, Long requestClubId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new EntityNotFoundException("delete Error"));
+
+        if(!schedule.getClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("Schedule Delete Error");
+        }
+
+        notificationRepository.deleteAll(schedule.getNotificationList());
         scheduleRepository.delete(schedule);
-        return ScheduleDto.DeleteResDto.builder().reqId(scheduleId).build();
+        return ScheduleDto.DeleteResDto.toDeleteResDto(schedule);
     }
 
     // ScheduleDashboard

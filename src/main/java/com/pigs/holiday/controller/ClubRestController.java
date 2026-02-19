@@ -31,6 +31,7 @@ public class ClubRestController {
     final ClubService clubService;
     final FileService fileService;
 
+    // Signup
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ClubDto.SignupResDto> signup(@RequestPart("request") ClubDto.SignupReqDto signupReqDto, @RequestPart(value = "image", required = false) MultipartFile file)  throws IOException {
         String s3Url = null;
@@ -39,12 +40,6 @@ public class ClubRestController {
         }
 
         return ResponseEntity.ok(clubService.signup(signupReqDto, s3Url));
-    }
-
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/clubId")
-    public ResponseEntity<Long> sendId(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(getReqUserId(principalDetails));
     }
 
     // Info
@@ -61,16 +56,32 @@ public class ClubRestController {
         return ResponseEntity.ok(clubService.dashboard(clubId, getReqUserId(principalDetails)));
     }
 
+    // Description
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("")
-    public ResponseEntity<List<ClubDto.ListResDto>> list() {
-        return ResponseEntity.ok(clubService.list());
+    @GetMapping("/description/{clubId}")
+    public ResponseEntity<ClubDto.DescriptionResDto> description(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.description(clubId, getReqUserId(principalDetails)));
     }
 
+    // Description Update
     @PreAuthorize("hasRole('USER')")
-    @PutMapping("/dashboard/{clubId}")
-    public ResponseEntity<ClubDto.DashboardUpdateResDto> dashboardUpdate(@RequestBody ClubDto.DashboardUpdateReqDto dashboardUpdateReqDto, @PathVariable Long clubId) {
-        return ResponseEntity.ok(clubService.dashboardUpdate(dashboardUpdateReqDto, clubId));
+    @PutMapping("/description")
+    public ResponseEntity<ClubDto.DescriptionUpdateResDto> descriptionUpdate(@RequestBody ClubDto.DescriptionUpdateReqDto descriptionUpdateReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.descriptionUpdate(descriptionUpdateReqDto, getReqUserId(principalDetails)));
+    }
+
+    // Award
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/award")
+    public ResponseEntity<ClubDto.AwardResDto> award(@RequestBody ClubDto.AwardReqDto awardReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.award(awardReqDto, getReqUserId(principalDetails)));
+    }
+
+    // Award
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/award/{awardId}")
+    public ResponseEntity<ClubDto.AwardDeleteResDto> awardDelete(@PathVariable Long awardId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.awardDelete(awardId, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -96,16 +107,11 @@ public class ClubRestController {
         return ResponseEntity.ok(clubService.delete(clubId));
     }
 
-    @PreAuthorize("hasRole('USER')")
-    @PutMapping("/mannerScore/{clubId}")
-    public ResponseEntity<ClubDto.MannerScoreRes> manner(@RequestBody ClubDto.MannerScoreReq mannerScoreReq, @PathVariable Long clubId) {
-        return ResponseEntity.ok(clubService.manner(mannerScoreReq,clubId));
-    }
-
+    // List
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
-    public ResponseEntity<List<ClubDto.SearchRes>> searchList(@RequestParam(required = false)String region, @RequestParam(required = false)String sportCategory) {
-        return ResponseEntity.ok(clubService.searchList(region, sportCategory));
+    public ResponseEntity<List<ClubDto.ListResDto>> list(@RequestBody ClubDto.ListReqDto listReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.list(listReqDto, getReqUserId(principalDetails)));
     }
 
 }

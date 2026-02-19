@@ -55,7 +55,6 @@ public class Club extends AuditingFields {
     @OneToMany(mappedBy = "senderClub")
     private List<MatchRequest> matchRequestList = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAchievement> userAchievements = new ArrayList<>();
 
@@ -63,7 +62,10 @@ public class Club extends AuditingFields {
     private List<Notification> notificationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "awayClub")
-    private List<Notification> AwaynotificationList = new ArrayList<>();
+    private List<Notification> awaynotificationList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "club")
+    private List<Award> awardList = new ArrayList<>();
 
     protected Club(){}
     private Club(String username, String password, String name, String university, String phone, String email, String clubName, String description, String region, String sportCategory, String imageUrl, int totalMatches, int totalWins, int totalDraws, int totalLosses, double mannerScore) {

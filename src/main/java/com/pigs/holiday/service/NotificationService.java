@@ -28,7 +28,7 @@ public class NotificationService {
 
         LocalDate today = LocalDate.now();
 
-        Boolean isNew = notificationRepository.existsByClubAndIsReadAndNotiDateLessThanEqual(club, false, today);
+        Boolean isNew = notificationRepository.existsByReceiveClubAndIsReadAndNotiDateLessThanEqual(club, false, today);
 
         return NotificationDto.CheckResDto.toCheckResDto(isNew);
     }
@@ -42,35 +42,35 @@ public class NotificationService {
         LocalDate today = LocalDate.now();
 
         NotificationDto.ListResDto listResDto = new NotificationDto.ListResDto();
-        listResDto.setDefaultNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
+        listResDto.setDefaultNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
 
-        listResDto.setSendNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
+        listResDto.setSendNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
 
-        listResDto.setReceiveNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
+        listResDto.setReceiveNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
 
-        listResDto.setFinishNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
+        listResDto.setFinishNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
 
         listResDto.setClubId(club.getId());
 
         List<Notification> detailList = new ArrayList<>();
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "rematch", today));
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "remind", today));
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "schedule", today));
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "matchCancel", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "rematch", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "remind", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "schedule", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "matchCancel", today));
 
         for (Notification notification : detailList) {
             notification.setIsRead(true);
         }
 
         List<NotificationDto.DetailResDto> detailResDtoList = new ArrayList<>();
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "rematch", today).stream().map(NotificationDto.DetailResDto::toRematchDetailResDto).toList());
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "remind", today).stream().map(NotificationDto.DetailResDto::toRemindDetailResDto).toList());
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "schedule", today).stream().map(NotificationDto.DetailResDto::toScheduleDetailResDto).toList());
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "matchCancel", today).stream().map(NotificationDto.DetailResDto::toMatchCancelDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "rematch", today).stream().map(NotificationDto.DetailResDto::toRematchDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "remind", today).stream().map(NotificationDto.DetailResDto::toRemindDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "schedule", today).stream().map(NotificationDto.DetailResDto::toScheduleDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "matchCancel", today).stream().map(NotificationDto.DetailResDto::toMatchCancelDetailResDto).toList());
 
         listResDto.setDetailResDtoList(detailResDtoList);
 
@@ -85,31 +85,31 @@ public class NotificationService {
         LocalDate today = LocalDate.now();
 
         NotificationDto.ListResDto listResDto = new NotificationDto.ListResDto();
-        listResDto.setDefaultNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
+        listResDto.setDefaultNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
 
-        listResDto.setSendNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
+        listResDto.setSendNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
 
-        listResDto.setReceiveNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
+        listResDto.setReceiveNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
 
-        listResDto.setFinishNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
+        listResDto.setFinishNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
 
         listResDto.setClubId(club.getId());
 
         List<Notification> detailList = new ArrayList<>();
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendYes", today));
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendNo", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendYes", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendNo", today));
 
         for (Notification notification : detailList) {
             notification.setIsRead(true);
         }
 
         List<NotificationDto.DetailResDto> detailResDtoList = new ArrayList<>();
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendYes", today).stream().map(NotificationDto.DetailResDto::toSendYesDetailResDto).toList());
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendNo", today).stream().map(NotificationDto.DetailResDto::toSendNoDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendYes", today).stream().map(NotificationDto.DetailResDto::toSendYesDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendNo", today).stream().map(NotificationDto.DetailResDto::toSendNoDetailResDto).toList());
 
         return listResDto;
     }
@@ -122,29 +122,29 @@ public class NotificationService {
         LocalDate today = LocalDate.now();
 
         NotificationDto.ListResDto listResDto = new NotificationDto.ListResDto();
-        listResDto.setDefaultNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
+        listResDto.setDefaultNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
 
-        listResDto.setSendNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
+        listResDto.setSendNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
 
-        listResDto.setReceiveNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
+        listResDto.setReceiveNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
 
-        listResDto.setFinishNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
+        listResDto.setFinishNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
 
         listResDto.setClubId(club.getId());
 
         List<Notification> detailList = new ArrayList<>();
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "receive", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "receive", today));
 
         for (Notification notification : detailList) {
             notification.setIsRead(true);
         }
 
         List<NotificationDto.DetailResDto> detailResDtoList = new ArrayList<>();
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "receive", today).stream().map(NotificationDto.DetailResDto::toReceiveDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "receive", today).stream().map(NotificationDto.DetailResDto::toReceiveDetailResDto).toList());
 
         return listResDto;
     }
@@ -157,29 +157,29 @@ public class NotificationService {
         LocalDate today = LocalDate.now();
 
         NotificationDto.ListResDto listResDto = new NotificationDto.ListResDto();
-        listResDto.setDefaultNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
+        listResDto.setDefaultNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "rematch", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "remind", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "schedule", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "matchCancel", today));
 
-        listResDto.setSendNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
-                + notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
+        listResDto.setSendNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendYes", today)
+                + notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "sendNo", today));
 
-        listResDto.setReceiveNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
+        listResDto.setReceiveNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "receive", today));
 
-        listResDto.setFinishNoti(notificationRepository.countByClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
+        listResDto.setFinishNoti(notificationRepository.countByReceiveClubAndIsReadAndNotiTypeAndNotiDateLessThanEqual(club, false, "finish", today));
 
         listResDto.setClubId(club.getId());
 
         List<Notification> detailList = new ArrayList<>();
-        detailList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "finish", today));
+        detailList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "finish", today));
 
         for (Notification notification : detailList) {
             notification.setIsRead(true);
         }
 
         List<NotificationDto.DetailResDto> detailResDtoList = new ArrayList<>();
-        detailResDtoList.addAll(notificationRepository.findByClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "finish", today).stream().map(NotificationDto.DetailResDto::toFinishDetailResDto).toList());
+        detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "finish", today).stream().map(NotificationDto.DetailResDto::toFinishDetailResDto).toList());
 
         return listResDto;
     }

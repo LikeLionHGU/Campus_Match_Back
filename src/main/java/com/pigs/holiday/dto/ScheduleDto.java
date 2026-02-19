@@ -10,6 +10,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class ScheduleDto {
 
@@ -47,28 +48,35 @@ public class ScheduleDto {
         }
     }
 
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ListResDto {
-        @JsonProperty("scheduleId")
-        Long id;
-        String title;
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate startDate;
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate endDate;
-        Boolean myClub;
+    // Calendar Response Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class CalendarResDto {
+        Boolean isMine;
 
-        public static ListResDto from(Schedule schedule) {
-            return ListResDto.builder()
-                    .id(schedule.getId())
+        List<ScheduleDto.ScheduleResDto> scheduleResDtoList;
+        List<MatchPostDto.ScheduleResDto> matchPostResDtoList;
+
+        public static ScheduleDto.CalendarResDto toCalendarResDto(Boolean isMine) {
+            return builder()
+                    .isMine(isMine)
+                    .build();
+        }
+    }
+
+    // Schedule Response Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class ScheduleResDto {
+        Long scheduleId;
+        String title;
+        LocalDate startDate;
+        LocalDate endDate;
+
+        public static ScheduleDto.ScheduleResDto toScheduleResDto(Schedule schedule) {
+            return builder()
+                    .scheduleId(schedule.getId())
                     .title(schedule.getTitle())
                     .startDate(schedule.getStartDate())
                     .endDate(schedule.getEndDate())
-                    .myClub(true)
                     .build();
         }
     }
@@ -79,7 +87,7 @@ public class ScheduleDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DetailResDto {
-        Long id;
+        Long scheduleId;
         String title;
         LocalDate startDate;
         LocalDate endDate;
@@ -87,19 +95,16 @@ public class ScheduleDto {
         LocalTime startTime;
         @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
-        Long clubId;
-        Boolean myClub;
 
 
         public static DetailResDto toDetailResDto(Schedule schedule) {
             return builder()
-                    .id(schedule.getId())
+                    .scheduleId(schedule.getId())
                     .title(schedule.getTitle())
                     .startDate(schedule.getStartDate())
                     .endDate(schedule.getEndDate())
                     .startTime(schedule.getStartTime())
                     .endTime(schedule.getEndTime())
-                    .clubId(schedule.getClub().getId())
                     .build();
         }
     }
@@ -110,7 +115,6 @@ public class ScheduleDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateReqDto{
-        Long id;
         String title;
         LocalDate startDate;
         LocalDate endDate;
@@ -126,7 +130,13 @@ public class ScheduleDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateResDto {
-        Long reqId;
+        Long scheduleId;
+
+        public static UpdateResDto toUpdateResDto(Schedule schedule) {
+            return builder()
+                    .scheduleId(schedule.getId())
+                    .build();
+        }
     }
 
     @Getter
@@ -135,7 +145,13 @@ public class ScheduleDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DeleteResDto {
-        Long reqId;
+        Long scheduleId;
+
+        public static DeleteResDto toDeleteResDto(Schedule schedule) {
+            return builder()
+                    .scheduleId(schedule.getId())
+                    .build();
+        }
     }
 
     // Dashboard

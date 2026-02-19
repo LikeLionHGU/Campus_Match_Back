@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pigs.holiday.mapper.MatchPostMapper">
+
+    <!--List-->
+    <select id="list" resultType="com.pigs.holiday.dto.MatchPostDto$ListResDto">
+        SELECT match_post.id as matchPostId,
+               match_post.match_date as matchDate,
+               match_post.sport_category as sportCategory,
+               club.id as clubId,
+               club.image_url as imageUrl,
+               club.club_name as clubName,
+               club.university as university,
+               club.region as region,
+               match_post.location as location,
+               club.manner_score as mannerScore
+        FROM match_post
+        JOIN club on club.id = match_post.home_club_id
+        WHERE 1=1
+            AND match_post.deleted = false
+            AND match_post.status = false
+
+            <if test="listReqDto.sportCategoryList != null and listReqDto.sportCategoryList.size() &gt; 0">
+                AND match_post.sport_category IN
+                <foreach collection="listReqDto.sportCategoryList" item="sportCategory" open="(" separator="," close=")">
+                    #{sportCategory}
+                </foreach>
+            </if>
+
+            <if test="listReqDto.regionList != null and listReqDto.regionList.size() &gt; 0">
+                AND club.region IN
+                <foreach collection="listReqDto.regionList" item="region" open="(" separator="," close=")">
+                    #{region}
+                </foreach>
+            </if>
+
+            <if test="listReqDto.startDate != null">
+                AND match_post.match_date &gt;= #{listReqDto.startDate}
+            </if>
+            <if test="listReqDto.endDate != null">
+                AND match_post.match_date &lt;= #{listReqDto.endDate}
+            </if>
+
+            <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+                AND (club.club_name LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+                    OR club.university LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+                    OR match_post.location LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+            </if>
+        ORDER BY match_post.match_date DESC, match_post.id DESC
+    </select>
+
+    <!--MineList-->
+    <select id="mineList" resultType="com.pigs.holiday.dto.MatchPostDto$ListResDto">
+        SELECT match_post.id as matchPostId,
+        match_post.match_date as matchDate,
+        match_post.sport_category as sportCategory,
+        club.id as clubId,
+        club.image_url as imageUrl,
+        club.club_name as clubName,
+        club.university as university,
+        club.region as region,
+        match_post.location as location,
+        club.manner_score as mannerScore
+        FROM match_post
+        JOIN club on club.id = match_post.home_club_id
+        WHERE 1=1
+        AND match_post.deleted = false
+        AND match_post.status = false
+        AND match_post.home_club_id = #{requestClubId}
+
+        <if test="listReqDto.sportCategoryList != null and listReqDto.sportCategoryList.size() &gt; 0">
+            AND match_post.sport_category IN
+            <foreach collection="listReqDto.sportCategoryList" item="sportCategory" open="(" separator="," close=")">
+                #{sportCategory}
+            </foreach>
+        </if>
+
+        <if test="listReqDto.regionList != null and listReqDto.regionList.size() &gt; 0">
+            AND club.region IN
+            <foreach collection="listReqDto.regionList" item="region" open="(" separator="," close=")">
+                #{region}
+            </foreach>
+        </if>
+
+        <if test="listReqDto.startDate != null">
+            AND match_post.match_date &gt;= #{listReqDto.startDate}
+        </if>
+        <if test="listReqDto.endDate != null">
+            AND match_post.match_date &lt;= #{listReqDto.endDate}
+        </if>
+
+        <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+            AND (club.club_name LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR club.university LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR match_post.location LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+        </if>
+        ORDER BY match_post.match_date DESC, match_post.id DESC
+    </select>
+
+    <!--OtherList-->
+    <select id="otherList" resultType="com.pigs.holiday.dto.MatchPostDto$ListResDto">
+        SELECT match_post.id as matchPostId,
+        match_post.match_date as matchDate,
+        match_post.sport_category as sportCategory,
+        club.id as clubId,
+        club.image_url as imageUrl,
+        club.club_name as clubName,
+        club.university as university,
+        club.region as region,
+        match_post.location as location,
+        club.manner_score as mannerScore
+        FROM match_post
+        JOIN club on club.id = match_post.home_club_id
+        WHERE 1=1
+        AND match_post.deleted = false
+        AND match_post.status = false
+        AND match_post.home_club_id != #{requestClubId}
+
+        <if test="listReqDto.sportCategoryList != null and listReqDto.sportCategoryList.size() &gt; 0">
+            AND match_post.sport_category IN
+            <foreach collection="listReqDto.sportCategoryList" item="sportCategory" open="(" separator="," close=")">
+                #{sportCategory}
+            </foreach>
+        </if>
+
+        <if test="listReqDto.regionList != null and listReqDto.regionList.size() &gt; 0">
+            AND club.region IN
+            <foreach collection="listReqDto.regionList" item="region" open="(" separator="," close=")">
+                #{region}
+            </foreach>
+        </if>
+
+        <if test="listReqDto.startDate != null">
+            AND match_post.match_date &gt;= #{listReqDto.startDate}
+        </if>
+        <if test="listReqDto.endDate != null">
+            AND match_post.match_date &lt;= #{listReqDto.endDate}
+        </if>
+
+        <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+            AND (club.club_name LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR club.university LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR match_post.location LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+        </if>
+        ORDER BY match_post.match_date DESC, match_post.id DESC
+    </select>
+
+</mapper>

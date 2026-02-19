@@ -1,5 +1,8 @@
 package com.pigs.holiday.service;
 
+import com.pigs.holiday.domain.Award;
+import com.pigs.holiday.mapper.ClubMapper;
+import com.pigs.holiday.repository.AwardRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.pigs.holiday.domain.Club;
@@ -8,6 +11,7 @@ import com.pigs.holiday.repository.ClubRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -16,12 +20,14 @@ import java.util.List;
 public class ClubService {
 
     final ClubRepository clubRepository;
+    final AwardRepository awardRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final MatchPostService matchPostService;
     private final MatchRequestService matchRequestService;
     private final ScheduleService scheduleService;
     private final GalleryService galleryService;
+    private final ClubMapper clubMapper;
 
     // Signup
     public ClubDto.SignupResDto signup(ClubDto.SignupReqDto signupReqDto, String s3Url) {
@@ -45,7 +51,7 @@ public class ClubService {
         return ClubDto.InfoResDto.toInfoResDto(club);
     }
 
-
+    // Dashboard
     @Transactional(readOnly = true)
     public ClubDto.DashboardResDto dashboard(Long clubId, Long requestClubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Club Dashboard Error"));
@@ -56,26 +62,52 @@ public class ClubService {
         dashboardResDto.setOngoingResDtoList(matchPostService.ongoingDashboard(clubId));
         dashboardResDto.setReceiveResDtoList(matchRequestService.receiveDashboard(clubId));
         dashboardResDto.setSendResDtoList(matchRequestService.sendDashboard(clubId));
-        dashboardResDto.setScheduleResDtoList(scheduleService.scheduleDashboard(clubId));
+        if(dashboardResDto.getIsMine()){
+            dashboardResDto.setScheduleResDtoList(scheduleService.scheduleDashboard(clubId));
+        }
         dashboardResDto.setGalleryResDtoList(galleryService.galleryDashboard(clubId));
 
         return dashboardResDto;
     }
 
+    // Description
     @Transactional(readOnly = true)
-    public List<ClubDto.ListResDto> list() {
-        List<Club> clubList = clubRepository.findByDeleted(false).orElseThrow(() -> new EntityNotFoundException("clubDetail Error"));
-        return clubList.stream().map(ClubDto.ListResDto :: toListResDto).toList();
+    public ClubDto.DescriptionResDto description(Long clubId, Long requestClubId) {
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Club Description Error"));
+        List<Award> awardList = club.getAwardList();
+
+        return ClubDto.DescriptionResDto.toDescriptionResDto(club, awardList.stream().map(ClubDto.AwardResDto::toAwardResDto).toList(), clubId.equals(requestClubId));
     }
 
-    //save를
+    // Description Update
     @Transactional
-    public ClubDto.DashboardUpdateResDto dashboardUpdate(ClubDto.DashboardUpdateReqDto dashboardUpdate, Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("clubUpdate Error"));
-        club.setDescription(dashboardUpdate.getDescription());
-        return ClubDto.DashboardUpdateResDto.builder().clubId(club.getId()).build();
+    public ClubDto.DescriptionUpdateResDto descriptionUpdate(ClubDto.DescriptionUpdateReqDto descriptionUpdateReqDto, Long requestClubId) {
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Club Description Error"));
+
+        if(StringUtils.hasText(descriptionUpdateReqDto.getDescription()) && !descriptionUpdateReqDto.getDescription().equals(requestClub.getDescription())) {
+            requestClub.setDescription(descriptionUpdateReqDto.getDescription());
+        }
+
+        return ClubDto.DescriptionUpdateResDto.toDescriptionUpdateResDto(requestClub);
     }
 
+    // Award Create
+    public ClubDto.AwardResDto award(ClubDto.AwardReqDto awardReqDto, Long requestClubId) {
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Club Award Create Error"));
+
+        return ClubDto.AwardResDto.toAwardResDto(awardRepository.save(awardReqDto.toEntity(requestClub)));
+    }
+
+    // Award Create
+    @Transactional
+    public ClubDto.AwardDeleteResDto awardDelete(Long awardId, Long requestClubId) {
+        Award award = awardRepository.findById(awardId).orElseThrow(() -> new EntityNotFoundException("Award Delete Error"));
+        if(award.getClub().getId().equals(requestClubId)) {
+            awardRepository.deleteById(awardId);
+        }
+
+        return ClubDto.AwardDeleteResDto.toAwardDeleteResDto(award);
+    }
 
     @Transactional(readOnly = true)
     public ClubDto.SettingDetailResDto settingDetail(Long clubId) {
@@ -88,25 +120,25 @@ public class ClubService {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new EntityNotFoundException("Setting update Error: " + clubId + " not found"));
 
-        if(settingUpdateReqDto.getUsername() != null && !settingUpdateReqDto.getUsername().isBlank()) {
+        if(StringUtils.hasText(settingUpdateReqDto.getUsername()) && !settingUpdateReqDto.getUsername().equals(club.getUsername())) {
             club.setUsername(settingUpdateReqDto.getUsername());
         }
-        if(settingUpdateReqDto.getPassword() != null && !settingUpdateReqDto.getPassword().isBlank()) {
+        if(StringUtils.hasText(settingUpdateReqDto.getPassword()) && !settingUpdateReqDto.getPassword().equals(club.getPassword())) {
             club.setPassword(bCryptPasswordEncoder.encode(settingUpdateReqDto.getPassword()));
         }
-        if(settingUpdateReqDto.getName() != null && !settingUpdateReqDto.getName().isBlank()) {
+        if(StringUtils.hasText(settingUpdateReqDto.getName()) && !settingUpdateReqDto.getName().equals(club.getName())) {
             club.setName(settingUpdateReqDto.getName());
         }
-        if(settingUpdateReqDto.getUniversity() != null && !settingUpdateReqDto.getUniversity().isBlank()) {
+        if(StringUtils.hasText(settingUpdateReqDto.getUniversity()) && !settingUpdateReqDto.getUniversity().equals(club.getUniversity())) {
             club.setUniversity(settingUpdateReqDto.getUniversity());
         }
-        if(settingUpdateReqDto.getPhone() != null && !settingUpdateReqDto.getPhone().isBlank()) {
+        if(StringUtils.hasText(settingUpdateReqDto.getPhone()) && !settingUpdateReqDto.getPhone().equals(club.getPhone())) {
             club.setPhone(settingUpdateReqDto.getPhone());
         }
-        if(settingUpdateReqDto.getEmail() != null && !settingUpdateReqDto.getEmail().isBlank()) {
+        if(StringUtils.hasText(settingUpdateReqDto.getEmail()) && !settingUpdateReqDto.getEmail().equals(club.getEmail())) {
             club.setEmail(settingUpdateReqDto.getEmail());
         }
-        if(settingUpdateReqDto.getClubName() != null && !settingUpdateReqDto.getClubName().isBlank()) {
+        if(StringUtils.hasText(settingUpdateReqDto.getClubName()) && !settingUpdateReqDto.getClubName().equals(club.getClubName())) {
             club.setClubName(settingUpdateReqDto.getClubName());
         }
         if(s3Url != null && !s3Url.isBlank()){
@@ -115,7 +147,6 @@ public class ClubService {
 
         return ClubDto.SettingUpdateResDto.builder().clubId(club.getId()).build();
     }
-
 
     @Transactional
     public ClubDto.SettingDeleteResDto delete(Long clubId) {
@@ -127,30 +158,10 @@ public class ClubService {
                 .build();
     }
 
-
-    //매너온도 세팅하는 거 로직 짜야함
-
-    @Transactional
-    public ClubDto.MannerScoreRes manner(ClubDto.MannerScoreReq mannerScoreReq,Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("manner Error"));
-
-        if(mannerScoreReq.getManner() == true) {
-            club.setMannerScore(club.getMannerScore() + 1);
-        }
-        else {
-            club.setMannerScore(club.getMannerScore() - 1);
-        }
-        return ClubDto.MannerScoreRes.builder().clubId(clubId).build();
-    }
-
+    // List
     @Transactional(readOnly = true)
-    public List<ClubDto.SearchRes> searchList(String region, String sportCategory) {
-        List<Club> club = clubRepository.findByDeleted(false).orElseThrow(() -> new EntityNotFoundException("searchList Error"));
-        return club.stream()
-                .filter(c -> region == null || region.isEmpty() || region.contains(c.getRegion()))
-                .filter(c -> sportCategory == null || sportCategory.isEmpty() || sportCategory.contains(c.getSportCategory()))
-                .map(ClubDto.SearchRes :: from)
-                .toList();
+    public List<ClubDto.ListResDto> list(ClubDto.ListReqDto listReqDto, Long requestClubId) {
+        return clubMapper.list(listReqDto, requestClubId);
     }
 
 }

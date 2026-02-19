@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pigs.holiday.mapper.ClubMapper">
+
+    <!--List-->
+    <select id="list" resultType="com.pigs.holiday.dto.ClubDto$ListResDto">
+        SELECT club.id as clubId,
+               club.region as region,
+               club.university as university,
+               club.club_name as clubName,
+               club.sport_category as sportCategory,
+               club.manner_score as mannerScore
+
+        FROM club
+        WHERE 1=1
+            AND club.deleted = false
+            AND club.id != #{requestClubId}
+
+            <if test="listReqDto.sportCategoryList != null and listReqDto.sportCategoryList.size() &gt; 0">
+                AND club.sport_category IN
+                <foreach collection="listReqDto.sportCategoryList" item="sportCategory" open="(" separator="," close=")">
+                    #{sportCategory}
+                </foreach>
+            </if>
+
+            <if test="listReqDto.regionList != null and listReqDto.regionList.size() &gt; 0">
+                AND club.region IN
+                <foreach collection="listReqDto.regionList" item="region" open="(" separator="," close=")">
+                    #{region}
+                </foreach>
+            </if>
+
+            <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+                AND (club.club_name LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+                    OR club.university LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+            </if>
+        ORDER BY club.created_at DESC
+    </select>
+
+</mapper>

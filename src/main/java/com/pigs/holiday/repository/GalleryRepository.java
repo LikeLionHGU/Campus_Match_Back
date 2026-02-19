@@ -13,7 +13,9 @@ public interface GalleryRepository extends JpaRepository<Gallery, Long> {
 
     List<Gallery> findByClubAndIsOfficial(Club club, Boolean isOfficial);
 
-    List<Gallery> findByIdAndDeleted(Long id, Boolean deleted);
-
     List<Gallery> findByIdAndDeletedAndIsOfficial(Long id, Boolean deleted, Boolean isOfficial);
+
+    List<Gallery> findByClubAndIsOfficialAndDeleted(Club club, Boolean isOfficial, Boolean deleted);
+
+    List<Gallery> findByClubAndDeleted(Club club, Boolean deleted);
 }

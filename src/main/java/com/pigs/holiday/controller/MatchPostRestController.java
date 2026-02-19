@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -37,22 +36,22 @@ public class MatchPostRestController {
     // List
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
-    public ResponseEntity<List<MatchPostDto.ListResDto>> list(){
-        return ResponseEntity.ok(matchPostService.list());
+    public ResponseEntity<List<MatchPostDto.ListResDto>> list(MatchPostDto.ListReqDto listReqDto){
+        return ResponseEntity.ok(matchPostService.list(listReqDto));
     }
 
     // MineList
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/mine")
-    public ResponseEntity<List<MatchPostDto.ListResDto>> mineList(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchPostService.mineList(getReqUserId(principalDetails)));
+    public ResponseEntity<List<MatchPostDto.ListResDto>> mineList(MatchPostDto.ListReqDto listReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchPostService.mineList(listReqDto, getReqUserId(principalDetails)));
     }
 
     // OtherList
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/mine")
-    public ResponseEntity<List<MatchPostDto.ListResDto>> otherList(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchPostService.otherList(getReqUserId(principalDetails)));
+    @GetMapping("/other")
+    public ResponseEntity<List<MatchPostDto.ListResDto>> otherList(MatchPostDto.ListReqDto listReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchPostService.otherList(listReqDto, getReqUserId(principalDetails)));
     }
 
     // Detail
@@ -132,25 +131,11 @@ public class MatchPostRestController {
         return ResponseEntity.ok(matchPostService.finishDetail(matchPostId, getReqUserId(principalDetails)));
     }
 
-    // ScheduleList
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/schedule/{clubId}")
-    public ResponseEntity<List<MatchPostDto.ScheduleListResDto>> scheduleList(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchPostService.scheduleList(clubId, getReqUserId(principalDetails)));
-    }
-
     // ScheduleDetail
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/schedule/detail/{clubId}")
-    public ResponseEntity<List<MatchPostDto.ScheduleListResDto>> scheduleList(@PathVariable Long clubId, @RequestParam("matchPostId") Long matchPostId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchPostService.scheduleList(clubId, matchPostId));
+    public ResponseEntity<MatchPostDto.ScheduleDetailResDto> scheduleDetail(@PathVariable Long clubId, @RequestParam("matchPostId") Long matchPostId, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchPostService.scheduleDetail(clubId, matchPostId, getReqUserId(principalDetails)));
     }
-
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("")
-    public ResponseEntity<List<MatchPostDto.SearchResDto>> searchList(@RequestParam(required = false) String region, @RequestParam(required = false) String sportCategory, @RequestParam(required = false) LocalDate matchDate ) {
-        return ResponseEntity.ok(matchPostService.searchList(region, sportCategory, matchDate));
-    }
-
 
 }

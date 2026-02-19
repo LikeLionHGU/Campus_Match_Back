@@ -18,6 +18,7 @@ public class MatchPost extends AuditingFields {
     String sportCategory;
     LocalDate matchDate;
     String location;
+    String locationDetail;
     LocalTime startTime;
     LocalTime endTime;
     String content;
@@ -35,10 +36,11 @@ public class MatchPost extends AuditingFields {
     private List<MatchRequest> matchRequestList = new ArrayList<>();
 
     protected MatchPost() {}
-    private MatchPost(String sportCategory, LocalDate matchDate, String location, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub) {
+    private MatchPost(String sportCategory, LocalDate matchDate, String location, String locationDetail, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub) {
         this.sportCategory = sportCategory;
         this.matchDate = matchDate;
         this.location = location;
+        this.locationDetail = locationDetail;
         this.startTime = startTime;
         this.endTime = endTime;
         this.content = content;
@@ -46,7 +48,7 @@ public class MatchPost extends AuditingFields {
         this.homeClub = homeClub;
         this.awayClub = awayClub;
     }
-    public static MatchPost of(String sportCategory, LocalDate matchDate, String location, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub) {
-        return new MatchPost(sportCategory, matchDate, location, startTime, endTime, content, status, homeClub, awayClub);
+    public static MatchPost of(String sportCategory, LocalDate matchDate, String location, String locationDetail, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub) {
+        return new MatchPost(sportCategory, matchDate, location, locationDetail, startTime, endTime, content, status, homeClub, awayClub);
     }
 }

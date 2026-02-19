@@ -35,7 +35,7 @@ public class MatchRequestService {
         MatchRequest matchRequest = createReqDto.toEntity(matchPost, requestClub);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("receive", today, "", false, matchPost.getHomeClub(), requestClub);
+        Notification notification = Notification.of("receive", today, "", false, matchPost.getHomeClub(), null, null);
         notificationRepository.save(notification);
 
         return MatchRequestDto.CreateResDto.toCreateResDto(matchRequestRepository.save(matchRequest));
@@ -98,7 +98,7 @@ public class MatchRequestService {
         matchRequest.setDeleted(true);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("sendNo", today, "", false, matchRequest.getMatchPost().getAwayClub(), matchRequest.getMatchPost().getHomeClub());
+        Notification notification = Notification.of("sendNo", today, "", false, matchRequest.getSenderClub(), null,  null);
         notificationRepository.save(notification);
 
         return MatchRequestDto.DeleteResDto.builder().matchRequestId(matchRequest.getId()).build();
@@ -121,7 +121,7 @@ public class MatchRequestService {
         matchRequestRepository.deleteByMatchPost(matchPost);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("sendYes", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub());
+        Notification notification = Notification.of("sendYes", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub(), null);
         notificationRepository.save(notification);
 
         return MatchRequestDto.UpdateResDto.builder().matchRequestId(matchRequest.getId()).build();
@@ -136,9 +136,6 @@ public class MatchRequestService {
         return matchRequestList.stream().map(matchRequest -> MatchRequestDto.ListResDto.toSendListResDto(matchRequest, clubId.equals(requestClubId))).toList();
     }
 
-
-
-
     // SendDetail
     @Transactional(readOnly = true)
     public MatchRequestDto.DetailResDto sendDetail(Long matchRequestId){
@@ -147,18 +144,12 @@ public class MatchRequestService {
     }
 
     // SendDelete
-    @Transactional//여기 transactional 추가 해놨습니다.
+    @Transactional
     public MatchRequestDto.DeleteResDto sendDelete(Long matchRequestId, Long requestClubId){
         MatchRequest matchRequest = matchRequestRepository.findById(matchRequestId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDelete Error"));
         if(!matchRequest.getSenderClub().getId().equals(requestClubId)) {
             throw new NoPermissionException("MatchRequest ReceiveDelete Error");
         }
-
-        // notification
-        //제가 일단 notification 넣었고
-        LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("sendNo", today, "", false, matchRequest.getMatchPost().getAwayClub(), matchRequest.getMatchPost().getHomeClub());
-        notificationRepository.save(notification);
 
         matchRequestRepository.deleteById(matchRequestId);
         return MatchRequestDto.DeleteResDto.builder().matchRequestId(matchRequest.getId()).build();

@@ -1,6 +1,7 @@
 package com.pigs.holiday.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pigs.holiday.domain.Award;
 import com.pigs.holiday.domain.Gallery;
 import lombok.*;
 import com.pigs.holiday.domain.Club;
@@ -57,6 +58,7 @@ public class ClubDto {
         }
     }
 
+    // Dashboard Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class DashboardResDto {
         Long clubId;
@@ -90,38 +92,75 @@ public class ClubDto {
         }
     }
 
+    // Description Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class ListResDto {
-        String clubName;
+    public static class DescriptionResDto {
+        double mannerScore;
         String description;
-        int totalMatches;
-        int totalWins;
-        int totalDraws;
-        int totalLosses;
-        int mannerScore;
+        List<AwardResDto> awardResDtoList;
+        Boolean isMine;
 
-        public static ListResDto toListResDto(Club club) {
-            return ListResDto.builder()
-                    .clubName(club.getClubName())
+        public static DescriptionResDto toDescriptionResDto(Club club, List<AwardResDto> awardResDtoList, Boolean isMine) {
+            return builder()
+                    .mannerScore(club.getMannerScore())
                     .description(club.getDescription())
-                    .totalMatches(club.getTotalMatches())
-                    .totalWins(club.getTotalWins())
-                    .totalDraws(club.getTotalDraws())
-                    .totalLosses(club.getTotalLosses())
+                    .awardResDtoList(awardResDtoList)
+                    .isMine(isMine)
                     .build();
         }
     }
 
+    // Award Create Request Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class DashboardUpdateReqDto {
+    public static class AwardReqDto {
+        String title;
+
+        public Award toEntity(Club club) { return Award.of(title, club);}
+    }
+
+    // Award Create Response Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class AwardResDto {
+        Long awardId;
+        String title;
+
+        public static AwardResDto toAwardResDto(Award award) {
+            return builder()
+                    .awardId(award.getId())
+                    .title(award.getTitle())
+                    .build();
+        }
+    }
+
+    // AwardDelete Response Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class AwardDeleteResDto {
+        Long awardId;
+
+        public static AwardDeleteResDto toAwardDeleteResDto(Award award) {
+            return builder()
+                    .awardId(award.getId())
+                    .build();
+        }
+    }
+
+    // Description update Request Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class DescriptionUpdateReqDto {
         String description;
     }
 
+    // Description update Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class DashboardUpdateResDto {
+    public static class DescriptionUpdateResDto {
         Long clubId;
-    }
 
+        public static DescriptionUpdateResDto toDescriptionUpdateResDto(Club club) {
+            return builder()
+                    .clubId(club.getId())
+                    .build();
+        }
+    }
 
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class SettingDetailResDto {
@@ -165,11 +204,28 @@ public class ClubDto {
         Long clubId;
     }
 
-
-
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class SettingDeleteResDto {
         Long clubId;
+    }
+
+    // CLub List
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class ListReqDto {
+        List<String> sportCategoryList;
+        List<String> regionList;
+        String keyword;
+    }
+
+    // CLub List
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class ListResDto {
+        Long clubId;
+        String region;
+        String university;
+        String clubName;
+        String sportCategory;
+        double mannerScore;
     }
 
     //동아리 온도 수정 미완

@@ -34,15 +34,15 @@ public class ScheduleRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("")
-    public ResponseEntity<List<ScheduleDto.ListResDto>> list(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return ResponseEntity.ok(scheduleService.list(getReqUserId(principalDetails)));
+    @GetMapping("/{clubId}")
+    public ResponseEntity<ScheduleDto.CalendarResDto> list(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(scheduleService.list(clubId, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/detail/{scheduleId}")
-    public ResponseEntity<ScheduleDto.DetailResDto> detail(@PathVariable Long scheduleId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return ResponseEntity.ok(scheduleService.detail(scheduleId, principalDetails.getClub().getId()));
+    public ResponseEntity<ScheduleDto.DetailResDto> detail(@PathVariable Long scheduleId) {
+        return ResponseEntity.ok(scheduleService.detail(scheduleId));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -53,7 +53,7 @@ public class ScheduleRestController {
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity<ScheduleDto.DeleteResDto> delete(@PathVariable Long scheduleId) {
-        return ResponseEntity.ok(scheduleService.delete(scheduleId));
+    public ResponseEntity<ScheduleDto.DeleteResDto> delete(@PathVariable Long scheduleId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(scheduleService.delete(scheduleId, getReqUserId(principalDetails)));
     }
 }
