@@ -14,9 +14,9 @@ import java.time.LocalDate;
 public class MatchHistory extends AuditingFields {
     LocalDate matchDate;
     String location;
-    String locationDetail;
     Boolean matchType;
     String result;
+    Boolean isOfficial;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_club_id", nullable = false)
@@ -27,16 +27,16 @@ public class MatchHistory extends AuditingFields {
     private Club awayClub;
 
     protected MatchHistory(){}
-    private MatchHistory(LocalDate matchDate, String location, String locationDetail, boolean matchType, String result, Club homeClub, Club awayClub) {
+    private MatchHistory(LocalDate matchDate, String location, boolean matchType, String result, Boolean isOfficial, Club homeClub, Club awayClub) {
         this.matchDate = matchDate;
         this.location = location;
-        this.locationDetail = locationDetail;
         this.matchType = matchType;
         this.result = result;
+        this.isOfficial = isOfficial;
         this.homeClub = homeClub;
         this.awayClub = awayClub;
     }
-    public static MatchHistory of(LocalDate matchDate, String location, String locationDetail, boolean matchType, String result, Club homeClub, Club awayClub) {
-        return new MatchHistory(matchDate, location, locationDetail, matchType, result, homeClub, awayClub);
+    public static MatchHistory of(LocalDate matchDate, String location, boolean matchType, String result, Boolean isOfficial, Club homeClub, Club awayClub) {
+        return new MatchHistory(matchDate, location, matchType, result, isOfficial, homeClub, awayClub);
     }
 }

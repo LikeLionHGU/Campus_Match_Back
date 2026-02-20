@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pigs.holiday.mapper.MatchHistoryMapper">
+
+    <!--List-->
+    <select id="list" resultType="com.pigs.holiday.dto.MatchHistoryDto$ListResDto">
+        SELECT match_history.id as matchHistoryId,
+               match_history.match_date as matchDate,
+               club.id as awayClubId,
+               club.image_url as imageUrl,
+               club.club_name as clubName,
+               club.university as university,
+               match_history.location as location,
+               match_history.match_type as matchType,
+               match_history.result as result
+        FROM match_history
+        JOIN club on club.id = match_history.away_club_id
+        WHERE 1=1
+            AND match_history.deleted = false
+            AND match_history.home_club_id = #{clubId}
+
+            <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+                AND (club.club_name LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+                    OR club.university LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+                    OR match_history.location LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+                    OR DATE_FORMAT(match_history.match_date, '%Y.%m.%d') LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+            </if>
+        ORDER BY match_history.match_date DESC, match_history.id DESC
+    </select>
+
+    <!--CreateList-->
+    <select id="createList" resultType="com.pigs.holiday.dto.MatchHistoryDto$ListResDto">
+        SELECT match_history.id as matchHistoryId,
+        match_history.match_date as matchDate,
+        club.id as awayClubId,
+        club.image_url as imageUrl,
+        club.club_name as clubName,
+        club.university as university,
+        match_history.location as location,
+        match_history.match_type as matchType,
+        match_history.result as result
+        FROM match_history
+        JOIN club on club.id = match_history.away_club_id
+        WHERE 1=1
+        AND match_history.deleted = false
+        AND match_history.home_club_id = #{clubId}
+        AND match_history.is_official = true
+
+        <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+            AND (club.club_name LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR club.university LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR match_history.location LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR DATE_FORMAT(match_history.match_date, '%Y.%m.%d') LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+        </if>
+        ORDER BY match_history.match_date DESC, match_history.id DESC
+    </select>
+
+    <!--AddList-->
+    <select id="addList" resultType="com.pigs.holiday.dto.MatchHistoryDto$ListResDto">
+        SELECT match_history.id as matchHistoryId,
+        match_history.match_date as matchDate,
+        club.id as awayClubId,
+        club.image_url as imageUrl,
+        club.club_name as clubName,
+        club.university as university,
+        match_history.location as location,
+        match_history.match_type as matchType,
+        match_history.result as result
+        FROM match_history
+        JOIN club on club.id = match_history.away_club_id
+        WHERE 1=1
+        AND match_history.deleted = false
+        AND match_history.home_club_id = #{clubId}
+        AND match_history.is_official = false
+
+        <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+            AND (club.club_name LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR club.university LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR match_history.location LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR DATE_FORMAT(match_history.match_date, '%Y.%m.%d') LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+        </if>
+        ORDER BY match_history.match_date DESC, match_history.id DESC
+    </select>
+
+</mapper>
