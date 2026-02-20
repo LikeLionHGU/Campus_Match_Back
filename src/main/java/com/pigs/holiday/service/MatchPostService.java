@@ -123,12 +123,32 @@ public class MatchPostService {
         return MatchPostDto.DeleteResDto.builder().matchPostId(matchPost.getId()).build();
     }
 
-    // UpcomingDashboard
+    // MatchPostDashboard
     @Transactional(readOnly = true)
     public List<MatchPostDto.DashboardResDto> matchPostDashboard(Long clubId){
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost UpcomingDashboard Error"));
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost MatchPostDashboard Error"));
+        LocalDate today = LocalDate.now();
 
-        return matchPostRepository.findByHomeClubAndDeletedAndStatusOrderByMatchDateDesc(club,false, false).stream().map(MatchPostDto.DashboardResDto::toDashboardAwayResDto).toList();
+        return matchPostRepository.findByHomeClubAndDeletedAndStatusAndMatchDateGreaterThanOrderByMatchDateDesc(club,false, false, today).stream().map(MatchPostDto.DashboardResDto::toDashboardAwayResDto).toList();
+    }
+
+    // PastDashboard
+    @Transactional(readOnly = true)
+    public List<MatchPostDto.DashboardResDto> pastDashboard(Long clubId){
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost PastDashboard Error"));
+
+        LocalDate today = LocalDate.now();
+        List<MatchPost> matchPostHomeList = matchPostRepository.findByHomeClubAndDeletedAndStatusAndMatchDateLessThanOrderByMatchDateDesc(club,false, true, today);
+        List<MatchPost> matchPostAwayList = matchPostRepository.findByAwayClubAndDeletedAndStatusAndMatchDateLessThanOrderByMatchDateDesc(club,false, true, today);
+
+        List<MatchPostDto.DashboardResDto> dashboardListResDtoList = new ArrayList<>();
+
+        dashboardListResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.DashboardResDto::toDashboardHomeResDto).toList());
+        dashboardListResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.DashboardResDto::toDashboardAwayResDto).toList());
+
+        dashboardListResDtoList.sort(Comparator.comparing(MatchPostDto.DashboardResDto::getMatchDate));
+
+        return dashboardListResDtoList;
     }
 
     // UpcomingDashboard
@@ -256,7 +276,6 @@ public class MatchPostService {
     // OngoingDelete
     @Transactional
     public MatchPostDto.DeleteResDto ongoingDelete(Long matchPostId, Long requestClubId){
-        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchPost OngoingDelete Error"));
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost OngoingDelete Error"));
         if(!matchPost.getHomeClub().getId().equals(requestClubId) && !matchPost.getAwayClub().getId().equals(requestClubId)) {
             throw new NoPermissionException("MatchPost OngoingDelete Error");
@@ -265,8 +284,10 @@ public class MatchPostService {
         matchPost.setDeleted(true);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("finish", today, "", false, matchPost.getHomeClub().getId().equals(requestClubId) ? matchPost.getAwayClub() : matchPost.getHomeClub(), requestClub,  null);
-        notificationRepository.save(notification);
+        Notification HomeNotification = Notification.of("finish", today, "", false, matchPost.getHomeClub(), matchPost.getAwayClub(),  null);
+        notificationRepository.save(HomeNotification);
+        Notification AwayNotification = Notification.of("finish", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub(),  null);
+        notificationRepository.save(AwayNotification);
 
         return MatchPostDto.DeleteResDto.builder().matchPostId(matchPost.getId()).build();
     }
@@ -279,11 +300,15 @@ public class MatchPostService {
         List<MatchPost> matchPostList = matchPostRepository.findByStatusAndDeletedAndMatchDateLessThan(true, false, today);
         for(MatchPost matchPost : matchPostList){
             matchPost.setDeleted(true);
+            Notification HomeNotification = Notification.of("finish", today, "", false, matchPost.getHomeClub(), matchPost.getAwayClub(),  null);
+            notificationRepository.save(HomeNotification);
+            Notification AwayNotification = Notification.of("finish", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub(),  null);
+            notificationRepository.save(AwayNotification);
         }
 
         Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchPost FinishList Error"));
-        List<MatchPost> matchPostHomeList = matchPostRepository.findByHomeClubAndStatusAndDeleted(requestClub, true, true);
-        List<MatchPost> matchPostAwayList = matchPostRepository.findByAwayClubAndStatusAndDeleted(requestClub, true, true);
+        List<MatchPost> matchPostHomeList = matchPostRepository.findFinishHomeList(requestClub);
+        List<MatchPost> matchPostAwayList = matchPostRepository.findFinishAwayList(requestClub);
 
         List<MatchPostDto.ListResDto> listResDtoList = new ArrayList<>();
         listResDtoList.addAll(matchPostHomeList.stream().map(MatchPostDto.ListResDto::toHomeListResDto).toList());
@@ -305,24 +330,6 @@ public class MatchPostService {
         }else{
             throw new NoPermissionException("MatchPost FinishDetail Error");
         }
-    }
-
-    // ScheduleList
-    @Transactional(readOnly = true)
-    public List<MatchPostDto.ScheduleResDto> scheduleList(Long clubId, Long requestClubId){
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost Schedule Error"));
-        List<MatchPost> matchPostHomeListFalse = matchPostRepository.findByHomeClubAndDeletedAndStatus(club, false, false);
-
-        List<MatchPostDto.ScheduleResDto> scheduleResDtoList = new ArrayList<>(matchPostHomeListFalse.stream().map(MatchPostDto.ScheduleResDto::toAwayResDto).toList());
-
-        if(clubId.equals(requestClubId)){
-            List<MatchPost> matchPostHomeListTrue = matchPostRepository.findByHomeClubAndDeletedAndStatus(club, false, true);
-            List<MatchPost> matchPostAwayList = matchPostRepository.findByAwayClubAndDeletedAndStatus(club, false, true);
-            scheduleResDtoList.addAll(matchPostHomeListTrue.stream().map(MatchPostDto.ScheduleResDto::toHomeResDto).toList());
-            scheduleResDtoList.addAll(matchPostAwayList.stream().map(MatchPostDto.ScheduleResDto::toAwayResDto).toList());
-        }
-
-        return  scheduleResDtoList;
     }
 
     // ScheduleDetail

@@ -29,7 +29,7 @@ public class MatchPostDto {
         String content;
 
         public MatchPost toEntity(Club requestClub) {
-            return MatchPost.of(getSportCategory(), getMatchDate(), getLocation(), getLocationDetail(), getStartTime(), getEndTime(), getContent(), false, requestClub, null);
+            return MatchPost.of(getSportCategory(), getMatchDate(), getLocation(), getLocationDetail(), getStartTime(), getEndTime(), getContent(), false, requestClub, null, null);
         }
     }
 
@@ -80,7 +80,7 @@ public class MatchPostDto {
                     .sportCategory(matchPost.getSportCategory())
                     .clubId(matchPost.getAwayClub().getId())
                     .imageUrl(matchPost.getAwayClub().getImageUrl())
-                    .clubName(matchPost.getAwayClub().getName())
+                    .clubName(matchPost.getAwayClub().getClubName())
                     .university(matchPost.getAwayClub().getUniversity())
                     .region(matchPost.getAwayClub().getRegion())
                     .location(matchPost.getLocation())
@@ -95,7 +95,7 @@ public class MatchPostDto {
                     .sportCategory(matchPost.getSportCategory())
                     .clubId(matchPost.getHomeClub().getId())
                     .imageUrl(matchPost.getHomeClub().getImageUrl())
-                    .clubName(matchPost.getHomeClub().getName())
+                    .clubName(matchPost.getHomeClub().getClubName())
                     .university(matchPost.getHomeClub().getUniversity())
                     .region(matchPost.getHomeClub().getRegion())
                     .location(matchPost.getLocation())
@@ -275,37 +275,6 @@ public class MatchPostDto {
                     .build();
         }
     }
-
-    // schedule Response Dto
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class ScheduleResDto {
-        Long matchPostId;
-        LocalDate matchDate;
-        String university;
-        String clubName;
-        Boolean status;
-
-        public static ScheduleResDto toHomeResDto(MatchPost matchPost) {
-            return builder()
-                    .matchPostId(matchPost.getId())
-                    .matchDate(matchPost.getMatchDate())
-                    .university(matchPost.getAwayClub().getUniversity())
-                    .clubName(matchPost.getAwayClub().getClubName())
-                    .status(matchPost.getStatus())
-                    .build();
-        }
-
-        public static ScheduleResDto toAwayResDto(MatchPost matchPost) {
-            return builder()
-                    .matchPostId(matchPost.getId())
-                    .matchDate(matchPost.getMatchDate())
-                    .university(matchPost.getHomeClub().getUniversity())
-                    .clubName(matchPost.getHomeClub().getClubName())
-                    .status(matchPost.getStatus())
-                    .build();
-        }
-    }
-
 
     // Schedule Detail Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor

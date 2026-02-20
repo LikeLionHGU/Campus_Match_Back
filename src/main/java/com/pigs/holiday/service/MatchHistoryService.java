@@ -1,17 +1,17 @@
 package com.pigs.holiday.service;
 
 
-import com.pigs.holiday.domain.Club;
-import com.pigs.holiday.domain.MatchHistory;
+import com.pigs.holiday.domain.*;
+import com.pigs.holiday.dto.GalleryDto;
 import com.pigs.holiday.dto.MatchHistoryDto;
 import com.pigs.holiday.exception.NoPermissionException;
-import com.pigs.holiday.repository.ClubRepository;
-import com.pigs.holiday.repository.MatchHistoryRepository;
+import com.pigs.holiday.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +22,11 @@ public class MatchHistoryService {
 
     final ClubRepository clubRepository;
     final MatchHistoryRepository matchHistoryRepository;
+    final MatchPostRepository matchPostRepository;
+    final NotificationRepository notificationRepository;
+    final MatchRequestRepository matchRequestRepository;
+
+    final GalleryService galleryService;
 
     public MatchHistoryDto.CreateResDto create(MatchHistoryDto.CreateReqDto createReqDto, Long requestClubId) {
         Club homeClub = clubRepository.findById(requestClubId)
@@ -90,6 +95,66 @@ public class MatchHistoryService {
         }
 
         return MatchHistoryDto.DeleteResDto.toDeleteResDto(matchHistory);
+    }
+
+    // Finish
+    @Transactional
+    public MatchHistoryDto.FinishResDto finish(Long matchPostId, MatchHistoryDto.FinishReqDto finishReqDto, List<String> imageUrls, Long requestClubId) {
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Finish Error"));
+        MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost Finish Error"));
+        Club awayClub = matchPost.getHomeClub().getId().equals(requestClubId) ? matchPost.getAwayClub() : matchPost.getHomeClub();
+
+        if(!matchPost.getAwayClub().getId().equals(requestClubId) && !matchPost.getHomeClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("MatchPost Finish Error");
+        }
+
+        if(matchPost.getFinishClub()!= null && matchPost.getFinishClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("MatchPost Finish Error");
+        }
+
+        MatchHistory matchHistory = finishReqDto.toEntity(requestClub, awayClub, matchPost);
+
+        requestClub.setTotalMatches(requestClub.getTotalMatches()+1);
+        if(finishReqDto.getMatchType()){
+            switch (finishReqDto.getResult()) {
+                case "승":
+                    requestClub.setTotalWins(requestClub.getTotalWins()+1);
+                    break;
+                case "패":
+                    requestClub.setTotalLosses(requestClub.getTotalLosses()+1);
+                    break;
+                case "무":
+                    requestClub.setTotalDraws(requestClub.getTotalDraws()+1);
+                    break;
+            }
+        }
+
+        if(finishReqDto.getMannerScore()){
+            awayClub.setMannerScore(awayClub.getMannerScore()+1);
+        }else{
+            awayClub.setMannerScore(awayClub.getMannerScore()-1);
+        }
+
+        if(finishReqDto.getRematch()){
+            LocalDate today = LocalDate.now();
+            Notification rematchNotification = Notification.of("rematch", today, "", false, awayClub, requestClub, null);
+            notificationRepository.save(rematchNotification);
+            Notification remindWeekNotification = Notification.of("remind", today.plusWeeks(1), "", false, awayClub, requestClub, null);
+            notificationRepository.save(remindWeekNotification);
+            Notification remindMonthNotification = Notification.of("remind", today.plusMonths(1), "", false, awayClub, requestClub, null);
+            notificationRepository.save(remindMonthNotification);
+        }
+
+        if(matchPost.getFinishClub()==null) {
+            matchPost.setFinishClub(requestClub);
+        }else{
+            matchRequestRepository.deleteByMatchPost(matchPost);
+            matchPostRepository.delete(matchPost);
+        }
+
+        galleryService.finish(GalleryDto.CreateReqDto.toCreateReqDto(finishReqDto, matchHistory), imageUrls, requestClubId);
+
+        return MatchHistoryDto.FinishResDto.toFinishResDto(matchHistoryRepository.save(matchHistory));
     }
 
 }

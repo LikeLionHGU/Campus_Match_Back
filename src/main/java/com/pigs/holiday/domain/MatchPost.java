@@ -35,8 +35,13 @@ public class MatchPost extends AuditingFields {
     @OneToMany(mappedBy = "matchPost")
     private List<MatchRequest> matchRequestList = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "finish_club_id", nullable = true)
+    private Club finishClub;
+
+
     protected MatchPost() {}
-    private MatchPost(String sportCategory, LocalDate matchDate, String location, String locationDetail, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub) {
+    private MatchPost(String sportCategory, LocalDate matchDate, String location, String locationDetail, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub, Club finishClub) {
         this.sportCategory = sportCategory;
         this.matchDate = matchDate;
         this.location = location;
@@ -47,8 +52,9 @@ public class MatchPost extends AuditingFields {
         this.status = status;
         this.homeClub = homeClub;
         this.awayClub = awayClub;
+        this.finishClub = finishClub;
     }
-    public static MatchPost of(String sportCategory, LocalDate matchDate, String location, String locationDetail, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub) {
-        return new MatchPost(sportCategory, matchDate, location, locationDetail, startTime, endTime, content, status, homeClub, awayClub);
+    public static MatchPost of(String sportCategory, LocalDate matchDate, String location, String locationDetail, LocalTime startTime, LocalTime endTime, String content, Boolean status, Club homeClub, Club awayClub, Club finishClub) {
+        return new MatchPost(sportCategory, matchDate, location, locationDetail, startTime, endTime, content, status, homeClub, awayClub, finishClub);
     }
 }

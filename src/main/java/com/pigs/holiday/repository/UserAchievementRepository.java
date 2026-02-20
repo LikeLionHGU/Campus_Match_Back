@@ -10,8 +10,6 @@ import java.util.List;
 
 @Repository
 public interface UserAchievementRepository extends JpaRepository<UserAchievement, Long> {
-    boolean existsByClubAndAchievement(Club club, Achievement achievement);
-
     List<UserAchievement> findByClub(Club club);
 
 }

@@ -54,7 +54,10 @@ public class ScheduleDto {
         Boolean isMine;
 
         List<ScheduleDto.ScheduleResDto> scheduleResDtoList;
-        List<MatchPostDto.ScheduleResDto> matchPostResDtoList;
+        List<MatchPostDto.DashboardResDto> upcomingResDtoList;
+        List<MatchPostDto.DashboardResDto> ongoingResDtoList;
+        List<MatchPostDto.DashboardResDto> matchResDtoList;
+        List<MatchPostDto.DashboardResDto> pastResDtoList;
 
         public static ScheduleDto.CalendarResDto toCalendarResDto(Boolean isMine) {
             return builder()

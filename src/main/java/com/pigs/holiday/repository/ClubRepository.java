@@ -11,5 +11,4 @@ import java.util.Optional;
 @Repository
 public interface ClubRepository extends JpaRepository<Club, Long> {
     Optional<Club> findByUsername(String username);
-    Optional<List<Club>> findByDeleted(Boolean deleted);
 }

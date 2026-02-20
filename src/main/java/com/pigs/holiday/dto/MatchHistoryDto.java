@@ -1,6 +1,7 @@
 package com.pigs.holiday.dto;
 import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.MatchHistory;
+import com.pigs.holiday.domain.MatchPost;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ public class MatchHistoryDto {
             return MatchHistory.of(
                     this.matchDate,
                     this.location,
+                    "",
                     true,
                     this.result,
                     homeClub,
@@ -134,4 +136,25 @@ public class MatchHistoryDto {
         }
     }
 
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class FinishReqDto {
+        String title;
+        Boolean matchType;
+        String result;
+        Boolean mannerScore;
+        Boolean rematch;
+
+        public MatchHistory toEntity(Club homeClub, Club awayClub, MatchPost matchPost){
+            return MatchHistory.of(matchPost.getMatchDate(), matchPost.getLocation(), matchPost.getLocationDetail(), getMatchType(), getResult(), homeClub, awayClub);
+        }
+    }
+
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class FinishResDto {
+        Long matchHistoryId;
+
+        public static MatchHistoryDto.FinishResDto toFinishResDto(MatchHistory matchHistory) {
+            return builder().matchHistoryId(matchHistory.getId()).build();
+        }
+    }
 }

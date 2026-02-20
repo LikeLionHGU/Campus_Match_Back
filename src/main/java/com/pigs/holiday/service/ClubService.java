@@ -61,6 +61,7 @@ public class ClubService {
         dashboardResDto.setUpcomingResDtoList(matchPostService.upcomingDashboard(clubId));
         dashboardResDto.setOngoingResDtoList(matchPostService.ongoingDashboard(clubId));
         dashboardResDto.setMatchResDtoList(matchPostService.matchPostDashboard(clubId));
+        dashboardResDto.setPastResDtoList(matchPostService.pastDashboard(clubId));
         dashboardResDto.setReceiveResDtoList(matchRequestService.receiveDashboard(clubId));
         dashboardResDto.setSendResDtoList(matchRequestService.sendDashboard(clubId));
         if(dashboardResDto.getIsMine()){

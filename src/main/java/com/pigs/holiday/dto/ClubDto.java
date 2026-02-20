@@ -74,6 +74,7 @@ public class ClubDto {
         List<MatchPostDto.DashboardResDto> upcomingResDtoList;
         List<MatchPostDto.DashboardResDto> ongoingResDtoList;
         List<MatchPostDto.DashboardResDto> matchResDtoList;
+        List<MatchPostDto.DashboardResDto> pastResDtoList;
         List<MatchRequestDto.DashboardResDto> receiveResDtoList;
         List<MatchRequestDto.DashboardResDto> sendResDtoList;
         List<ScheduleDto.DashboardResDto> scheduleResDtoList;
@@ -228,53 +229,5 @@ public class ClubDto {
         String sportCategory;
         double mannerScore;
     }
-
-    //동아리 온도 수정 미완
-
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class MannerScoreReq {
-        Boolean manner;
-    }
-
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class MannerScoreRes {
-        Long clubId;
-    }
-    //검색 페이지 미완
-
-
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-    public  static class SearchRes {
-        Long clubId;
-        String university;
-        String region;
-        String clubName;
-        String sportCategory;
-        double mannerScore;
-
-        public static SearchRes from(Club club) {
-            return SearchRes.builder()
-                    .clubId(club.getId())
-                    .university(club.getUniversity())
-                    .region(club.getRegion())
-                    .clubName(club.getClubName())
-                    .sportCategory(club.getSportCategory())
-                    .mannerScore(club.getMannerScore())
-                    .build();
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

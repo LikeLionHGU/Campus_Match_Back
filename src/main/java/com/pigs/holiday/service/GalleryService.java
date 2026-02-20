@@ -45,6 +45,25 @@ public class GalleryService {
         return GalleryDto.CreateResDto.toCreateResDto(gallery);
     }
 
+    // Create
+    public GalleryDto.CreateResDto finish(GalleryDto.CreateReqDto createReqDto, List<String> imageUrls, Long requestClubId) {
+        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Create Error"));
+        Gallery gallery = createReqDto.toFinish(club);
+
+        galleryRepository.save(gallery);
+
+        if (imageUrls != null) {
+            for (String url : imageUrls) {
+                GalleryImage galleryImage = GalleryImage.of(url, gallery);
+
+                galleryImageRepository.save(galleryImage);
+            }
+        }
+
+        return GalleryDto.CreateResDto.toCreateResDto(gallery);
+    }
+
+
     // List
     @Transactional(readOnly = true)
     public List<GalleryDto.ListResDto> list(Long clubId, GalleryDto.ListReqDto listReqDto) {

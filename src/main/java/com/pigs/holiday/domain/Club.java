@@ -52,6 +52,9 @@ public class Club extends AuditingFields {
     @OneToMany(mappedBy = "awayClub")
     private List<MatchPost> awayMatchPostList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "finishClub")
+    private List<MatchPost> finishMatchPostList = new ArrayList<>();
+
     @OneToMany(mappedBy = "senderClub")
     private List<MatchRequest> matchRequestList = new ArrayList<>();
 

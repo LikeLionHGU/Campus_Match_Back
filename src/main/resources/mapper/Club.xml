@@ -6,6 +6,7 @@
     <select id="list" resultType="com.pigs.holiday.dto.ClubDto$ListResDto">
         SELECT club.id as clubId,
                club.region as region,
+               club.image_url as imageUrl,
                club.university as university,
                club.club_name as clubName,
                club.sport_category as sportCategory,

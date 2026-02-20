@@ -3,6 +3,7 @@ package com.pigs.holiday.dto;
 import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.Gallery;
 import com.pigs.holiday.domain.GalleryImage;
+import com.pigs.holiday.domain.MatchHistory;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -16,7 +17,16 @@ public class GalleryDto {
         String title;
         LocalDate matchDate;
 
-        public Gallery toEntity(Club club) { return Gallery.of(getMatchDate(), getTitle(), false,club); }
+        public Gallery toEntity(Club club) { return Gallery.of(getMatchDate(), getTitle(), false, club); }
+
+        public Gallery toFinish(Club club) { return Gallery.of(getMatchDate(), getTitle(), true, club); }
+
+        public static CreateReqDto toCreateReqDto(MatchHistoryDto.FinishReqDto finishReqDto, MatchHistory matchHistory) {
+            return builder()
+                    .title(finishReqDto.getTitle())
+                    .matchDate(matchHistory.getMatchDate())
+                    .build();
+        }
     }
 
     // Create Response Dto
