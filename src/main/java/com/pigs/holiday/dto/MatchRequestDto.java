@@ -43,6 +43,8 @@ public class MatchRequestDto {
         LocalDate matchDate;
         String university;
         String clubName;
+        String sportCategory;
+        double mannerScore;
 
         public static DashboardResDto toDashboardReceiveResDto(MatchRequest matchRequest) {
             return builder()
@@ -50,6 +52,8 @@ public class MatchRequestDto {
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .university(matchRequest.getSenderClub().getUniversity())
                     .clubName(matchRequest.getSenderClub().getClubName())
+                    .sportCategory(matchRequest.getMatchPost().getSportCategory())
+                    .mannerScore(matchRequest.getSenderClub().getMannerScore())
                     .build();
         }
 
@@ -59,6 +63,8 @@ public class MatchRequestDto {
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .university(matchRequest.getMatchPost().getHomeClub().getUniversity())
                     .clubName(matchRequest.getMatchPost().getHomeClub().getClubName())
+                    .sportCategory(matchRequest.getMatchPost().getSportCategory())
+                    .mannerScore(matchRequest.getMatchPost().getHomeClub().getMannerScore())
                     .build();
         }
     }
@@ -76,37 +82,34 @@ public class MatchRequestDto {
         String region;
         String location;
         double mannerScore;
-        Boolean isMine;
 
-        public static ListResDto toReceiveListResDto(MatchRequest matchRequest, Boolean isMine) {
+        public static ListResDto toReceiveListResDto(MatchRequest matchRequest) {
             return builder()
                     .matchRequestId(matchRequest.getId())
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .sportCategory(matchRequest.getMatchPost().getSportCategory())
                     .clubId(matchRequest.getSenderClub().getId())
                     .imageUrl(matchRequest.getSenderClub().getImageUrl())
-                    .clubName(matchRequest.getSenderClub().getName())
+                    .clubName(matchRequest.getSenderClub().getClubName())
                     .university(matchRequest.getSenderClub().getUniversity())
                     .region(matchRequest.getSenderClub().getRegion())
                     .location(matchRequest.getMatchPost().getLocation())
                     .mannerScore(matchRequest.getSenderClub().getMannerScore())
-                    .isMine(isMine)
                     .build();
         }
 
-        public static ListResDto toSendListResDto(MatchRequest matchRequest, Boolean isMine) {
+        public static ListResDto toSendListResDto(MatchRequest matchRequest) {
             return builder()
                     .matchRequestId(matchRequest.getId())
                     .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .sportCategory(matchRequest.getMatchPost().getSportCategory())
                     .clubId(matchRequest.getMatchPost().getHomeClub().getId())
                     .imageUrl(matchRequest.getMatchPost().getHomeClub().getImageUrl())
-                    .clubName(matchRequest.getMatchPost().getHomeClub().getName())
+                    .clubName(matchRequest.getMatchPost().getHomeClub().getClubName())
                     .university(matchRequest.getMatchPost().getHomeClub().getUniversity())
                     .region(matchRequest.getMatchPost().getHomeClub().getRegion())
                     .location(matchRequest.getMatchPost().getLocation())
                     .mannerScore(matchRequest.getMatchPost().getHomeClub().getMannerScore())
-                    .isMine(isMine)
                     .build();
         }
     }
@@ -114,21 +117,21 @@ public class MatchRequestDto {
     // Detail Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class DetailResDto {
-        LocalDate matchDate;
         @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
         @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
         String location;
+        String locationDetail;
         String phone;
         String content;
 
         public static DetailResDto toReceiveDetailResDto(MatchRequest matchRequest) {
             return builder()
-                    .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .startTime(matchRequest.getStartTime())
                     .endTime(matchRequest.getEndTime())
                     .location(matchRequest.getMatchPost().getLocation())
+                    .locationDetail(matchRequest.getMatchPost().getLocationDetail())
                     .phone(matchRequest.getSenderClub().getPhone())
                     .content(matchRequest.getMatchPost().getContent())
                     .build();
@@ -136,14 +139,20 @@ public class MatchRequestDto {
 
         public static DetailResDto toSendDetailResDto(MatchRequest matchRequest) {
             return builder()
-                    .matchDate(matchRequest.getMatchPost().getMatchDate())
                     .startTime(matchRequest.getStartTime())
                     .endTime(matchRequest.getEndTime())
                     .location(matchRequest.getMatchPost().getLocation())
+                    .locationDetail(matchRequest.getMatchPost().getLocationDetail())
                     .phone(matchRequest.getMatchPost().getHomeClub().getPhone())
                     .content(matchRequest.getMatchPost().getContent())
                     .build();
         }
+    }
+
+    // Delete Request Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class DeleteReqDto {
+        String content;
     }
 
     // Delete Response Dto

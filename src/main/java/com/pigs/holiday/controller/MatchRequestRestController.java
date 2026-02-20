@@ -35,14 +35,14 @@ public class MatchRequestRestController {
 
     // ReceiveList
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/receive/{clubId}")
-    public ResponseEntity<List<MatchRequestDto.ListResDto>> receiveList(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchRequestService.receiveList(clubId, getReqUserId(principalDetails)));
+    @GetMapping("/receive")
+    public ResponseEntity<List<MatchRequestDto.ListResDto>> receiveList(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchRequestService.receiveList(getReqUserId(principalDetails)));
     }
 
     // ReceiveDetail
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("receive/detail/{matchRequestId}")
+    @GetMapping("receive/{matchRequestId}")
     public ResponseEntity<MatchRequestDto.DetailResDto> receiveDetail(@PathVariable Long matchRequestId){
         return ResponseEntity.ok(matchRequestService.receiveDetail(matchRequestId));
     }
@@ -50,8 +50,8 @@ public class MatchRequestRestController {
     // ReceiveDelete
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("receive/{matchRequestId}")
-    public ResponseEntity<MatchRequestDto.DeleteResDto> receiveDelete(@PathVariable Long matchRequestId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchRequestService.receiveDelete(matchRequestId, getReqUserId(principalDetails)));
+    public ResponseEntity<MatchRequestDto.DeleteResDto> receiveDelete(@PathVariable Long matchRequestId, @RequestBody MatchRequestDto.DeleteReqDto deleteReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchRequestService.receiveDelete(matchRequestId, deleteReqDto, getReqUserId(principalDetails)));
     }
 
     // ReceiveUpdate
@@ -63,22 +63,22 @@ public class MatchRequestRestController {
 
     // SendList
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/send/{clubId}")
-    public ResponseEntity<List<MatchRequestDto.ListResDto>> sendList(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchRequestService.sendList(clubId, getReqUserId(principalDetails)));
+    @GetMapping("/send")
+    public ResponseEntity<List<MatchRequestDto.ListResDto>> sendList(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchRequestService.sendList(getReqUserId(principalDetails)));
     }
 
     // SendDetail
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("send/detail/{matchRequestId}")
+    @GetMapping("send/{matchRequestId}")
     public ResponseEntity<MatchRequestDto.DetailResDto> sendDetail(@PathVariable Long matchRequestId){
         return ResponseEntity.ok(matchRequestService.sendDetail(matchRequestId));
     }
 
-    // SendDetail
+    // SendDelete
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("send/delete/{matchRequestId}")
-    public ResponseEntity<MatchRequestDto.DeleteResDto> sendDelete(@PathVariable Long matchRequestId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchRequestService.sendDelete(matchRequestId, getReqUserId(principalDetails)));
+    public ResponseEntity<MatchRequestDto.DeleteResDto> sendDelete(@PathVariable Long matchRequestId, @RequestBody MatchRequestDto.DeleteReqDto deleteReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchRequestService.sendDelete(matchRequestId, deleteReqDto, getReqUserId(principalDetails)));
     }
 }

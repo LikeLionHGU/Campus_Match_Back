@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pigs.holiday.mapper.GalleryMapper">
+
+    <!--List-->
+    <select id="list" resultType="com.pigs.holiday.dto.GalleryDto$ListResDto">
+        SELECT gallery.id as galleryId,
+               gallery.title as title,
+               gallery.match_date as matchDate,
+               gallery_image.image_url as imageUrl,
+               gallery.is_official as isOfficial
+        FROM gallery
+        LEFT JOIN (
+            SELECT gallery_id, MIN(id) AS image_id
+            FROM gallery_image
+            WHERE deleted = false
+            GROUP BY gallery_id
+        ) gallery_image_0 ON gallery_image_0.gallery_id = gallery.id
+
+        LEFT JOIN gallery_image ON gallery_image.id = gallery_image_0.image_id
+
+        WHERE 1=1
+            AND gallery.deleted = false
+            AND gallery.club_id = #{clubId}
+
+            <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+                AND (gallery.title LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+                    OR DATE_FORMAT(gallery.match_date, '%Y.%m.%d') LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+            </if>
+        ORDER BY gallery.match_date DESC, gallery.id DESC
+    </select>
+
+    <!--MatchList-->
+    <select id="matchList" resultType="com.pigs.holiday.dto.GalleryDto$ListResDto">
+        SELECT gallery.id as galleryId,
+        gallery.title as title,
+        gallery.match_date as matchDate,
+        gallery_image.image_url as imageUrl,
+        gallery.is_official as isOfficial
+        FROM gallery
+            LEFT JOIN (
+            SELECT gallery_id, MIN(id) AS image_id
+            FROM gallery_image
+            WHERE deleted = false
+            GROUP BY gallery_id
+        ) gallery_image_0 ON gallery_image_0.gallery_id = gallery.id
+
+        LEFT JOIN gallery_image ON gallery_image.id = gallery_image_0.image_id
+
+        WHERE 1=1
+        AND gallery.deleted = false
+        AND gallery.club_id = #{clubId}
+        AND gallery.is_official = true
+
+        <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+            AND (gallery.title LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR DATE_FORMAT(gallery.match_date, '%Y.%m.%d') LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+        </if>
+        ORDER BY gallery.match_date DESC, gallery.id DESC
+    </select>
+
+    <!--MyClubList-->
+    <select id="myClubList" resultType="com.pigs.holiday.dto.GalleryDto$ListResDto">
+        SELECT gallery.id as galleryId,
+        gallery.title as title,
+        gallery.match_date as matchDate,
+        gallery_image.image_url as imageUrl,
+        gallery.is_official as isOfficial
+        FROM gallery
+        LEFT JOIN (
+            SELECT gallery_id, MIN(id) AS image_id
+            FROM gallery_image
+            WHERE deleted = false
+            GROUP BY gallery_id
+        ) gallery_image_0 ON gallery_image_0.gallery_id = gallery.id
+
+        LEFT JOIN gallery_image ON gallery_image.id = gallery_image_0.image_id
+
+        WHERE 1=1
+        AND gallery.deleted = false
+        AND gallery.club_id = #{clubId}
+        AND gallery.is_official = false
+
+        <if test="listReqDto.keyword != null and listReqDto.keyword.trim() != ''">
+            AND (gallery.title LIKE CONCAT('%', #{listReqDto.keyword}, '%')
+            OR DATE_FORMAT(gallery.match_date, '%Y.%m.%d') LIKE CONCAT('%', #{listReqDto.keyword}, '%'))
+        </if>
+        ORDER BY gallery.match_date DESC, gallery.id DESC
+    </select>
+
+</mapper>

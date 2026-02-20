@@ -9,13 +9,5 @@ import java.util.List;
 
 @Repository
 public interface GalleryRepository extends JpaRepository<Gallery, Long> {
-    List<Gallery> findByClub(Club club);
-
-    List<Gallery> findByClubAndIsOfficial(Club club, Boolean isOfficial);
-
     List<Gallery> findByIdAndDeletedAndIsOfficial(Long id, Boolean deleted, Boolean isOfficial);
-
-    List<Gallery> findByClubAndIsOfficialAndDeleted(Club club, Boolean isOfficial, Boolean deleted);
-
-    List<Gallery> findByClubAndDeleted(Club club, Boolean deleted);
 }

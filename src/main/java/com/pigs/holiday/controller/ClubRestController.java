@@ -109,7 +109,7 @@ public class ClubRestController {
 
     // List
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("")
+    @PostMapping("")
     public ResponseEntity<List<ClubDto.ListResDto>> list(@RequestBody ClubDto.ListReqDto listReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return ResponseEntity.ok(clubService.list(listReqDto, getReqUserId(principalDetails)));
     }

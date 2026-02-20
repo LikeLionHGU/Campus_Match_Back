@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class MatchHistory extends AuditingFields {
     LocalDate matchDate;
     String location;
+    String locationDetail;
     Boolean matchType;
     String result;
 
@@ -26,15 +27,16 @@ public class MatchHistory extends AuditingFields {
     private Club awayClub;
 
     protected MatchHistory(){}
-    private MatchHistory(LocalDate matchDate, String location, boolean matchType, String result, Club homeClub, Club awayClub) {
+    private MatchHistory(LocalDate matchDate, String location, String locationDetail, boolean matchType, String result, Club homeClub, Club awayClub) {
         this.matchDate = matchDate;
         this.location = location;
+        this.locationDetail = locationDetail;
         this.matchType = matchType;
         this.result = result;
         this.homeClub = homeClub;
         this.awayClub = awayClub;
     }
-    public static MatchHistory of(LocalDate matchDate, String location, boolean matchType, String result, Club homeClub, Club awayClub) {
-        return new MatchHistory(matchDate, location, matchType, result, homeClub, awayClub);
+    public static MatchHistory of(LocalDate matchDate, String location, String locationDetail, boolean matchType, String result, Club homeClub, Club awayClub) {
+        return new MatchHistory(matchDate, location, locationDetail, matchType, result, homeClub, awayClub);
     }
 }

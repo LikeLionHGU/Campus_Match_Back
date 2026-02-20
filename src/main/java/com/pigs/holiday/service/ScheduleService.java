@@ -44,10 +44,12 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public ScheduleDto.CalendarResDto list(Long clubId, Long requestClubId) {
         ScheduleDto.CalendarResDto calendarResDto = ScheduleDto.CalendarResDto.toCalendarResDto(clubId.equals(requestClubId));
-        if(calendarResDto.getIsMine()){
-            calendarResDto.setScheduleResDtoList(scheduleRepository.findByClubIdAndDeleted(clubId, false).stream().map(ScheduleDto.ScheduleResDto::toScheduleResDto).collect(Collectors.toList()));
-        }
-        calendarResDto.setMatchPostResDtoList(matchPostService.scheduleList(clubId, requestClubId));
+
+        calendarResDto.setScheduleResDtoList(scheduleRepository.findByClubIdAndDeleted(clubId, false).stream().map(ScheduleDto.ScheduleResDto::toScheduleResDto).collect(Collectors.toList()));
+        calendarResDto.setUpcomingResDtoList(matchPostService.upcomingDashboard(clubId));
+        calendarResDto.setOngoingResDtoList(matchPostService.ongoingDashboard(clubId));
+        calendarResDto.setMatchResDtoList(matchPostService.matchPostDashboard(clubId));
+        calendarResDto.setPastResDtoList(matchPostService.pastDashboard(clubId));
 
         return calendarResDto;
     }

@@ -48,7 +48,6 @@ public class NotificationDto {
                     .notiType(notification.getNotiType())
                     .awayClubName(notification.getAwayClub().getName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
-                    .awayClubId(notification.getAwayClub().getId())
                     .build();
         }
 
@@ -58,6 +57,7 @@ public class NotificationDto {
                     .notiType(notification.getNotiType())
                     .awayClubName(notification.getAwayClub().getName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
+                    .awayClubId(notification.getAwayClub().getId())
                     .build();
         }
 
@@ -104,6 +104,16 @@ public class NotificationDto {
                     .notiType(notification.getNotiType())
                     .awayClubName(notification.getAwayClub().getName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
+                    .build();
+        }
+
+        public static DetailResDto toReceiveCancelDetailResDto(Notification notification) {
+            return builder()
+                    .notificationId(notification.getId())
+                    .notiType(notification.getNotiType())
+                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubUniversity(notification.getAwayClub().getUniversity())
+                    .content(notification.getContent())
                     .build();
         }
 

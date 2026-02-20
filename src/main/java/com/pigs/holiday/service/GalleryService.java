@@ -5,6 +5,7 @@ import com.pigs.holiday.domain.Gallery;
 import com.pigs.holiday.domain.GalleryImage;
 import com.pigs.holiday.dto.GalleryDto;
 import com.pigs.holiday.exception.NoPermissionException;
+import com.pigs.holiday.mapper.GalleryMapper;
 import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.GalleryImageRepository;
 import com.pigs.holiday.repository.GalleryRepository;
@@ -12,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -23,11 +25,12 @@ public class GalleryService {
     final GalleryRepository galleryRepository;
     final GalleryImageRepository galleryImageRepository;
 
+    final GalleryMapper galleryMapper;
+
     // Create
     public GalleryDto.CreateResDto create(GalleryDto.CreateReqDto createReqDto, List<String> imageUrls, Long requestClubId) {
         Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Create Error"));
-        Gallery gallery = createReqDto.toEntity();
-        gallery.setClub(club);
+        Gallery gallery = createReqDto.toEntity(club);
 
         galleryRepository.save(gallery);
 
@@ -42,60 +45,68 @@ public class GalleryService {
         return GalleryDto.CreateResDto.toCreateResDto(gallery);
     }
 
+    // Create
+    public GalleryDto.CreateResDto finish(GalleryDto.CreateReqDto createReqDto, List<String> imageUrls, Long requestClubId) {
+        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Create Error"));
+        Gallery gallery = createReqDto.toFinish(club);
+
+        galleryRepository.save(gallery);
+
+        if (imageUrls != null) {
+            for (String url : imageUrls) {
+                GalleryImage galleryImage = GalleryImage.of(url, gallery);
+
+                galleryImageRepository.save(galleryImage);
+            }
+        }
+
+        return GalleryDto.CreateResDto.toCreateResDto(gallery);
+    }
+
+
     // List
     @Transactional(readOnly = true)
-    public List<GalleryDto.ListResDto> list(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery List Error"));
-        List<Gallery> galleryList = galleryRepository.findByClubAndDeleted(club, false);
-
-        return galleryList.stream().map(GalleryDto.ListResDto::toListResDto).toList();
+    public List<GalleryDto.ListResDto> list(Long clubId, GalleryDto.ListReqDto listReqDto) {
+        return galleryMapper.list(clubId, listReqDto);
     }
 
     // MatchList
     @Transactional(readOnly = true)
-    public List<GalleryDto.ListResDto> matchList(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery MyClubList Error"));
-        List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficialAndDeleted(club, true, false);
-
-        return galleryList.stream().map(GalleryDto.ListResDto::toListResDto).toList();
+    public List<GalleryDto.ListResDto> matchList(Long clubId, GalleryDto.ListReqDto listReqDto) {
+        return galleryMapper.matchList(clubId, listReqDto);
     }
 
     // MyClubList
     @Transactional(readOnly = true)
-    public List<GalleryDto.ListResDto> myClubList(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery MyClubList Error"));
-        List<Gallery> galleryList = galleryRepository.findByClubAndIsOfficialAndDeleted(club, false, false);
-
-        return galleryList.stream().map(GalleryDto.ListResDto::toListResDto).toList();
+    public List<GalleryDto.ListResDto> myClubList(Long clubId, GalleryDto.ListReqDto listReqDto) {
+        return galleryMapper.myClubList(clubId, listReqDto);
     }
 
     // Detail
     @Transactional(readOnly = true)
     public GalleryDto.DetailResDto detail(Long galleryId, Long requestClubId) {
-        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Detail Error"));
         Gallery gallery = galleryRepository.findById(galleryId).orElseThrow(() -> new EntityNotFoundException("Gallery Detail Error"));
 
-        return GalleryDto.DetailResDto.toDetailResDto(gallery, gallery.getClub().equals(club));
+        return GalleryDto.DetailResDto.toDetailResDto(gallery, gallery.getClub().getId().equals(requestClubId));
     }
 
     // Update
     @Transactional
     public GalleryDto.UpdateResDto update(Long galleryId, GalleryDto.UpdateReqDto updateReqDto, List<String> imageUrls, Long requestClubId) {
-        Club club = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("Gallery Update Error"));
         Gallery gallery = galleryRepository.findById(galleryId).orElseThrow(() -> new EntityNotFoundException("Gallery Update Error"));
 
-        if(!gallery.getClub().equals(club)) {
+        if(!gallery.getClub().getId().equals(requestClubId)) {
             throw new NoPermissionException("Gallery Update Error");
         }
 
-        if(!updateReqDto.getTitle().isBlank()){
+        if(StringUtils.hasText(updateReqDto.getTitle()) && !updateReqDto.getTitle().equals(gallery.getTitle())){
             gallery.setTitle(updateReqDto.getTitle());
         }
-        if(updateReqDto.getMatchDate()!=null){
+        if(updateReqDto.getMatchDate()!=null && !updateReqDto.getMatchDate().equals(gallery.getMatchDate())){
             gallery.setMatchDate(updateReqDto.getMatchDate());
         }
 
-        if (imageUrls != null) {
+        if (imageUrls != null && !imageUrls.isEmpty()) {
             List<GalleryImage> currentImages = gallery.getGalleryImageList();
 
             List<GalleryImage> imagesToDelete = currentImages.stream()
@@ -112,6 +123,7 @@ public class GalleryService {
                 if (!isExist) {
                     GalleryImage newImage = GalleryImage.of(url, gallery);
                     galleryImageRepository.save(newImage);
+                    currentImages.add(newImage);
                 }
             }
         }
