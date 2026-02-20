@@ -60,12 +60,14 @@ public class ClubService {
         dashboardResDto.setIsMine(clubId.equals(requestClubId));
         dashboardResDto.setUpcomingResDtoList(matchPostService.upcomingDashboard(clubId));
         dashboardResDto.setOngoingResDtoList(matchPostService.ongoingDashboard(clubId));
+        dashboardResDto.setMatchResDtoList(matchPostService.matchPostDashboard(clubId));
         dashboardResDto.setReceiveResDtoList(matchRequestService.receiveDashboard(clubId));
         dashboardResDto.setSendResDtoList(matchRequestService.sendDashboard(clubId));
         if(dashboardResDto.getIsMine()){
             dashboardResDto.setScheduleResDtoList(scheduleService.scheduleDashboard(clubId));
         }
         dashboardResDto.setGalleryResDtoList(galleryService.galleryDashboard(clubId));
+
 
         return dashboardResDto;
     }

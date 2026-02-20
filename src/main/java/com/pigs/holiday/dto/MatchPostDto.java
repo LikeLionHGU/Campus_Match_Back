@@ -194,8 +194,9 @@ public class MatchPostDto {
     // IngDetail Response Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class IngDetailResDto {
-        LocalDate matchDate;
+        @JsonFormat(pattern = "HH:mm")
         LocalTime startTime;
+        @JsonFormat(pattern = "HH:mm")
         LocalTime endTime;
         String location;
         String locationDetail;
@@ -204,7 +205,6 @@ public class MatchPostDto {
 
         public static IngDetailResDto toIngHomeDetailResDto(MatchPost matchPost) {
             return builder()
-                    .matchDate(matchPost.getMatchDate())
                     .startTime(matchPost.getStartTime())
                     .endTime(matchPost.getEndTime())
                     .location(matchPost.getLocation())
@@ -216,7 +216,6 @@ public class MatchPostDto {
 
         public static IngDetailResDto toIngAwayDetailResDto(MatchPost matchPost) {
             return builder()
-                    .matchDate(matchPost.getMatchDate())
                     .startTime(matchPost.getStartTime())
                     .endTime(matchPost.getEndTime())
                     .location(matchPost.getLocation())
@@ -237,28 +236,42 @@ public class MatchPostDto {
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class FinishDetailResDto {
         Long clubId;
-        Long oppositionClubId;
         LocalDate matchDate;
+        @JsonFormat(pattern = "HH:mm")
+        LocalTime startTime;
+        @JsonFormat(pattern = "HH:mm")
+        LocalTime endTime;
+        Long oppositionClubId;
+        String phone;
         String location;
         String locationDetail;
+        String content;
 
         public static FinishDetailResDto toFinishHomeDetailResDto(MatchPost matchPost) {
             return builder()
                     .clubId(matchPost.getHomeClub().getId())
-                    .oppositionClubId(matchPost.getAwayClub().getId())
                     .matchDate(matchPost.getMatchDate())
+                    .startTime(matchPost.getStartTime())
+                    .endTime(matchPost.getEndTime())
+                    .oppositionClubId(matchPost.getAwayClub().getId())
+                    .phone(matchPost.getAwayClub().getPhone())
                     .location(matchPost.getLocation())
                     .locationDetail(matchPost.getLocationDetail())
+                    .content(matchPost.getContent())
                     .build();
         }
 
         public static FinishDetailResDto toFinishAwayDetailResDto(MatchPost matchPost) {
             return builder()
                     .clubId(matchPost.getAwayClub().getId())
-                    .oppositionClubId(matchPost.getHomeClub().getId())
                     .matchDate(matchPost.getMatchDate())
+                    .startTime(matchPost.getStartTime())
+                    .endTime(matchPost.getEndTime())
+                    .oppositionClubId(matchPost.getHomeClub().getId())
+                    .phone(matchPost.getHomeClub().getPhone())
                     .location(matchPost.getLocation())
                     .locationDetail(matchPost.getLocationDetail())
+                    .content(matchPost.getContent())
                     .build();
         }
     }

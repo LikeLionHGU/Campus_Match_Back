@@ -73,6 +73,7 @@ public class ClubDto {
 
         List<MatchPostDto.DashboardResDto> upcomingResDtoList;
         List<MatchPostDto.DashboardResDto> ongoingResDtoList;
+        List<MatchPostDto.DashboardResDto> matchResDtoList;
         List<MatchRequestDto.DashboardResDto> receiveResDtoList;
         List<MatchRequestDto.DashboardResDto> sendResDtoList;
         List<ScheduleDto.DashboardResDto> scheduleResDtoList;
