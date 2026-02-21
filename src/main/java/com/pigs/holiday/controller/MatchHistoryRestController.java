@@ -6,6 +6,7 @@ import com.pigs.holiday.security.PrincipalDetails;
 import com.pigs.holiday.service.FileService;
 import com.pigs.holiday.service.MatchHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -74,7 +75,7 @@ public class MatchHistoryRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/finish/{matchPostId}")
+    @PostMapping(value = "/finish/{matchPostId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MatchHistoryDto.FinishResDto> finish(@PathVariable Long matchPostId, @RequestPart("request") MatchHistoryDto.FinishReqDto finishReqDto, @RequestPart("images") List<MultipartFile> files, @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException {
         List<String> s3Urls = fileService.uploadFiles(files, "likepigs/");
 
