@@ -1,8 +1,6 @@
 package com.pigs.holiday.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pigs.holiday.domain.Award;
-import com.pigs.holiday.domain.Gallery;
 import lombok.*;
 import com.pigs.holiday.domain.Club;
 import lombok.experimental.SuperBuilder;
@@ -230,4 +228,15 @@ public class ClubDto {
         double mannerScore;
     }
 
+    @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
+    public static class SearchReqDto {
+        String keyword;
+    }
+
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class SearchResDto {
+        Long clubId;
+        String clubName;
+        String university;
+    }
 }

@@ -38,4 +38,22 @@
         ORDER BY club.created_at DESC
     </select>
 
+    <!--Search-->
+    <select id="search" resultType="com.pigs.holiday.dto.ClubDto$SearchResDto">
+        SELECT club.id as clubId,
+        club.university as university,
+        club.club_name as clubName
+
+        FROM club
+        WHERE 1=1
+        AND club.deleted = false
+        AND club.id != #{requestClubId}
+
+        <if test="searchReqDto.keyword != null and searchReqDto.keyword.trim() != ''">
+            AND (club.club_name LIKE CONCAT('%', #{searchReqDto.keyword}, '%')
+            OR club.university LIKE CONCAT('%', #{searchReqDto.keyword}, '%'))
+        </if>
+        ORDER BY club.created_at DESC
+    </select>
+
 </mapper>

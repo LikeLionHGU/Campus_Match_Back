@@ -38,15 +38,33 @@ public class MatchHistoryRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/{clubId}")
-    public ResponseEntity<List<MatchHistoryDto.ListResDto>> list(@PathVariable Long clubId) {
-        return ResponseEntity.ok(matchHistoryService.list(clubId));
+    @PostMapping("/{clubId}")
+    public ResponseEntity<MatchHistoryDto.HistoryResDto> list(@PathVariable Long clubId, @RequestBody MatchHistoryDto.ListReqDto listReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(matchHistoryService.list(clubId, listReqDto, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PutMapping("")
-    public ResponseEntity<MatchHistoryDto.UpdateResDto> update(@RequestBody MatchHistoryDto.UpdateReqDto updateReqDto,  @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return ResponseEntity.ok(matchHistoryService.update(updateReqDto, principalDetails.getClub().getId()));
+    @PostMapping("/createList/{clubId}")
+    public ResponseEntity<MatchHistoryDto.HistoryResDto> createList(@PathVariable Long clubId, @RequestBody MatchHistoryDto.ListReqDto listReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(matchHistoryService.createList(clubId, listReqDto, getReqUserId(principalDetails)));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/addList/{clubId}")
+    public ResponseEntity<MatchHistoryDto.HistoryResDto> addList(@PathVariable Long clubId, @RequestBody MatchHistoryDto.ListReqDto listReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(matchHistoryService.addList(clubId, listReqDto, getReqUserId(principalDetails)));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/{matchHistoryId}")
+    public ResponseEntity<MatchHistoryDto.DetailResDto> detail(@PathVariable Long matchHistoryId) {
+        return ResponseEntity.ok(matchHistoryService.detail(matchHistoryId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/{matchHistoryId}")
+    public ResponseEntity<MatchHistoryDto.UpdateResDto> update(@PathVariable Long matchHistoryId, @RequestBody MatchHistoryDto.UpdateReqDto updateReqDto,  @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(matchHistoryService.update(matchHistoryId, updateReqDto, principalDetails.getClub().getId()));
     }
 
     @PreAuthorize("hasRole('USER')")

@@ -9,4 +9,5 @@ import java.util.List;
 @Mapper
 public interface ClubMapper {
     List<ClubDto.ListResDto> list(@Param("listReqDto") ClubDto.ListReqDto listReqDto,@Param("requestClubId") Long requestClubId);
+    List<ClubDto.SearchResDto> search(@Param("searchReqDto") ClubDto.SearchReqDto searchReqDto,@Param("requestClubId") Long requestClubId);
 }

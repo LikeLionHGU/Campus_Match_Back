@@ -5,14 +5,15 @@ import com.pigs.holiday.domain.*;
 import com.pigs.holiday.dto.GalleryDto;
 import com.pigs.holiday.dto.MatchHistoryDto;
 import com.pigs.holiday.exception.NoPermissionException;
+import com.pigs.holiday.mapper.MatchHistoryMapper;
 import com.pigs.holiday.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -28,71 +29,137 @@ public class MatchHistoryService {
 
     final GalleryService galleryService;
 
+    final MatchHistoryMapper matchHistoryMapper;
+
+    @Transactional
     public MatchHistoryDto.CreateResDto create(MatchHistoryDto.CreateReqDto createReqDto, Long requestClubId) {
-        Club homeClub = clubRepository.findById(requestClubId)
-                .orElseThrow(() -> new EntityNotFoundException("Home Club Not Found"));
+        Club homeClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchHistory Create Error"));
+        Club awayClub = clubRepository.findById(createReqDto.getAwayClubId()).orElseThrow(() -> new EntityNotFoundException("MatchHistory Create Error"));
 
-        Club awayClub = clubRepository.findById(createReqDto.getOppositionClubId())
-                .orElseThrow(() -> new EntityNotFoundException("Away Club Not Found"));
+        homeClub.setTotalMatches(homeClub.getTotalMatches() + 1);
+        if(createReqDto.getMatchType()){
+            switch (createReqDto.getResult()) {
+                case "승":
+                    homeClub.setTotalWins(homeClub.getTotalWins()+1);
+                    break;
+                case "패":
+                    homeClub.setTotalLosses(homeClub.getTotalLosses()+1);
+                    break;
+                case "무":
+                    homeClub.setTotalDraws(homeClub.getTotalDraws()+1);
+                    break;
+            }
+        }
 
-        MatchHistory matchHistory = createReqDto.toEntity(homeClub, awayClub);
-        return MatchHistoryDto.CreateResDto.toCreateResDto(matchHistoryRepository.save(matchHistory));
-
+        return MatchHistoryDto.CreateResDto.toCreateResDto(matchHistoryRepository.save(createReqDto.toEntity(homeClub, awayClub)));
     }
 
+    @Transactional(readOnly = true)
+    public MatchHistoryDto.HistoryResDto list(Long clubId, MatchHistoryDto.ListReqDto listReqDto, Long requestClubId) {
+        MatchHistoryDto.HistoryResDto historyResDto = MatchHistoryDto.HistoryResDto.toHistoryResDto(clubId.equals(requestClubId));
+        historyResDto.setMatchHistoryList(matchHistoryMapper.list(clubId, listReqDto));
+        return historyResDto;
+    }
 
     @Transactional(readOnly = true)
-    public List<MatchHistoryDto.ListResDto> list(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchHistory List Error"));
-        List<MatchHistory> homeClubList = matchHistoryRepository.findByHomeClub(club);
-        List<MatchHistory> awayClubList = matchHistoryRepository.findByAwayClub(club);
+    public MatchHistoryDto.HistoryResDto createList(Long clubId, MatchHistoryDto.ListReqDto listReqDto, Long requestClubId) {
+        MatchHistoryDto.HistoryResDto historyResDto = MatchHistoryDto.HistoryResDto.toHistoryResDto(clubId.equals(requestClubId));
+        historyResDto.setMatchHistoryList(matchHistoryMapper.createList(clubId, listReqDto));
+        return historyResDto;
+    }
 
-        List<MatchHistoryDto.ListResDto> resDtoList = new ArrayList<>();
+    @Transactional(readOnly = true)
+    public MatchHistoryDto.HistoryResDto addList(Long clubId, MatchHistoryDto.ListReqDto listReqDto, Long requestClubId) {
+        MatchHistoryDto.HistoryResDto historyResDto = MatchHistoryDto.HistoryResDto.toHistoryResDto(clubId.equals(requestClubId));
+        historyResDto.setMatchHistoryList(matchHistoryMapper.addList(clubId, listReqDto));
+        return historyResDto;
+    }
 
-        resDtoList.addAll(homeClubList.stream().map(MatchHistoryDto.ListResDto::toHomeResDto).toList());
-        resDtoList.addAll(awayClubList.stream().map(MatchHistoryDto.ListResDto::toAwayResDto).toList());
+    @Transactional(readOnly = true)
+    public MatchHistoryDto.DetailResDto detail(Long matchHistoryId) {
+        MatchHistory matchHistory = matchHistoryRepository.findById(matchHistoryId).orElseThrow(() -> new EntityNotFoundException("MatchHistory Detail Error"));
 
-        return resDtoList;
+        return MatchHistoryDto.DetailResDto.toDetailResDto(matchHistory);
     }
 
     @Transactional
-    public MatchHistoryDto.UpdateResDto update(MatchHistoryDto.UpdateReqDto reqDto, Long requestClubId) {
+    public MatchHistoryDto.UpdateResDto update(Long matchHistoryId, MatchHistoryDto.UpdateReqDto updateReqDto, Long requestClubId) {
+        Club homeClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchHistory Update Error"));
+        MatchHistory matchHistory = matchHistoryRepository.findById(matchHistoryId).orElseThrow(() -> new EntityNotFoundException("MatchHistory Update Error"));
 
-        MatchHistory matchHistory = matchHistoryRepository.findById(reqDto.getMatchHistoryId())
-                .orElseThrow(() -> new EntityNotFoundException("MatchHistory Not Found"));
-
-        if (!matchHistory.getHomeClub().getId().equals(requestClubId)) { throw new IllegalArgumentException("수정 권한이 없습니다.");}
-
-        if (reqDto.getOppositionClubId() != null) {
-            Club newOpponent = clubRepository.findById(reqDto.getOppositionClubId())
-                    .orElseThrow(() -> new EntityNotFoundException("Opposition Club Not Found"));
-            matchHistory.setAwayClub(newOpponent);
+        if (!matchHistory.getHomeClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("MatchHistory Update Error");
         }
 
-        if (reqDto.getMatchDate() != null) {
-            matchHistory.setMatchDate(reqDto.getMatchDate());
+        if(updateReqDto.getMatchDate()!=null && !updateReqDto.getMatchDate().equals(matchHistory.getMatchDate())) {
+            matchHistory.setMatchDate(updateReqDto.getMatchDate());
+        }
+        if(StringUtils.hasText(updateReqDto.getLocation()) && !updateReqDto.getLocation().equals(matchHistory.getLocation())) {
+            matchHistory.setLocation(updateReqDto.getLocation());
+        }
+        if(updateReqDto.getAwayClubId()!=null && !updateReqDto.getAwayClubId().equals(matchHistory.getAwayClub().getId())) {
+            Club awayClub = clubRepository.findById(updateReqDto.getAwayClubId()).orElseThrow(() -> new EntityNotFoundException("MatchHistory Update Error"));
+            matchHistory.setAwayClub(awayClub);
+        }
+        if(updateReqDto.getMatchType()!=null) {
+            if(matchHistory.getMatchType()) {
+                switch (matchHistory.getResult()) {
+                    case "승":
+                        homeClub.setTotalWins(homeClub.getTotalWins()-1);
+                        break;
+                    case "패":
+                        homeClub.setTotalLosses(homeClub.getTotalLosses()-1);
+                        break;
+                    case "무":
+                        homeClub.setTotalDraws(homeClub.getTotalDraws()-1);
+                        break;
+                }
+            }
+            matchHistory.setMatchType(updateReqDto.getMatchType());
+            matchHistory.setResult(updateReqDto.getResult());
         }
 
-        if (reqDto.getMatchType() != null) {
-            matchHistory.setMatchType(reqDto.getMatchType());
+        if(matchHistory.getMatchType()){
+            switch (matchHistory.getResult()) {
+                case "승":
+                    homeClub.setTotalWins(homeClub.getTotalWins()+1);
+                    break;
+                case "패":
+                    homeClub.setTotalLosses(homeClub.getTotalLosses()+1);
+                    break;
+                case "무":
+                    homeClub.setTotalDraws(homeClub.getTotalDraws()+1);
+                    break;
+            }
         }
 
-        if (reqDto.getResult() != null && !reqDto.getResult().isBlank()) {
-            matchHistory.setResult(reqDto.getResult());
-        }
-        return MatchHistoryDto.UpdateResDto.builder()
-                .matchHistoryId(matchHistory.getId())
-                .build();
+        return MatchHistoryDto.UpdateResDto.toUpdateResDto(matchHistoryRepository.save(matchHistory));
     }
 
-    public MatchHistoryDto.DeleteResDto delete(Long matchHistoryId, Long clubId) {
+    @Transactional
+    public MatchHistoryDto.DeleteResDto delete(Long matchHistoryId, Long requestClubId) {
+        Club homeClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("MatchHistory Delete Error"));
         MatchHistory matchHistory = matchHistoryRepository.findById(matchHistoryId).orElseThrow(() -> new EntityNotFoundException("History Delete Error"));
-
-        if(matchHistory.getHomeClub().getId().equals(clubId)||matchHistory.getAwayClub().getId().equals(clubId)) {
-            matchHistoryRepository.delete(matchHistory);
-        }else{
+        if(!matchHistory.getHomeClub().getId().equals(requestClubId)) {
             throw new NoPermissionException("History Delete Error");
         }
+
+        homeClub.setTotalMatches(homeClub.getTotalMatches()-1);
+        if(matchHistory.getMatchType()){
+            switch (matchHistory.getResult()) {
+                case "승":
+                    homeClub.setTotalWins(homeClub.getTotalWins()-1);
+                    break;
+                case "패":
+                    homeClub.setTotalLosses(homeClub.getTotalLosses()-1);
+                    break;
+                case "무":
+                    homeClub.setTotalDraws(homeClub.getTotalDraws()-1);
+                    break;
+            }
+        }
+
+        matchHistoryRepository.delete(matchHistory);
 
         return MatchHistoryDto.DeleteResDto.toDeleteResDto(matchHistory);
     }

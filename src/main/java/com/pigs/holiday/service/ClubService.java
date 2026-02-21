@@ -167,4 +167,10 @@ public class ClubService {
         return clubMapper.list(listReqDto, requestClubId);
     }
 
+    // Search
+    @Transactional(readOnly = true)
+    public List<ClubDto.SearchResDto> search(ClubDto.SearchReqDto searchReqDto, Long requestClubId) {
+        return clubMapper.search(searchReqDto, requestClubId);
+    }
+
 }
