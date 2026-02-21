@@ -114,4 +114,10 @@ public class ClubRestController {
         return ResponseEntity.ok(clubService.list(listReqDto, getReqUserId(principalDetails)));
     }
 
+    // Search
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/search")
+    public ResponseEntity<List<ClubDto.SearchResDto>> search(@RequestBody ClubDto.SearchReqDto searchReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.search(searchReqDto, getReqUserId(principalDetails)));
+    }
 }
