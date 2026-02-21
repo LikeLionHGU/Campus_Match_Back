@@ -103,18 +103,20 @@ public class MatchHistoryService {
             matchHistory.setAwayClub(awayClub);
         }
         if(updateReqDto.getMatchType()!=null) {
-            matchHistory.setMatchType(updateReqDto.getMatchType());
-            switch (matchHistory.getResult()) {
-                case "승":
-                    homeClub.setTotalWins(homeClub.getTotalWins()-1);
-                    break;
-                case "패":
-                    homeClub.setTotalLosses(homeClub.getTotalLosses()-1);
-                    break;
-                case "무":
-                    homeClub.setTotalDraws(homeClub.getTotalDraws()-1);
-                    break;
+            if(matchHistory.getMatchType()) {
+                switch (matchHistory.getResult()) {
+                    case "승":
+                        homeClub.setTotalWins(homeClub.getTotalWins()-1);
+                        break;
+                    case "패":
+                        homeClub.setTotalLosses(homeClub.getTotalLosses()-1);
+                        break;
+                    case "무":
+                        homeClub.setTotalDraws(homeClub.getTotalDraws()-1);
+                        break;
+                }
             }
+            matchHistory.setMatchType(updateReqDto.getMatchType());
             matchHistory.setResult(updateReqDto.getResult());
         }
 
