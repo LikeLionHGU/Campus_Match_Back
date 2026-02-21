@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Arrays;
 
@@ -117,12 +118,16 @@ public class SecurityConfig {
             jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
             http
+                    // 예외 처리 필터
+                    .addFilterBefore(new FilterExceptionHandlerFilter(objectMapper), UsernamePasswordAuthenticationFilter.class)
                     // 로그인 필터
                     .addFilter(jwtAuthenticationFilter)
                     // JWT 검증 필터
-                    .addFilter(new JwtAuthorizationFilter(authenticationManager, clubRepository, authService, externalProperties))
+                    .addFilter(new JwtAuthorizationFilter(authenticationManager, clubRepository, authService, externalProperties));
+                    /*
                     // 예외 처리 필터
                     .addFilterBefore(new FilterExceptionHandlerFilter(), BasicAuthenticationFilter.class);
+                     */
         }
 
     }

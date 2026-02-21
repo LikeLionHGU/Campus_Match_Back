@@ -102,9 +102,9 @@ public class ClubRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @DeleteMapping("/setting/{clubId}")
-    public ResponseEntity<ClubDto.SettingDeleteResDto> delete(@PathVariable Long clubId) {
-        return ResponseEntity.ok(clubService.delete(clubId));
+    @DeleteMapping("/setting")
+    public ResponseEntity<ClubDto.SettingDeleteResDto> delete(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.delete(getReqUserId(principalDetails)));
     }
 
     // List

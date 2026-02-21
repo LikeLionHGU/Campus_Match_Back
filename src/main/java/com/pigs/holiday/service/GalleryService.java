@@ -147,7 +147,8 @@ public class GalleryService {
 
     // Gallery Dashboard
     public List<GalleryDto.DashboardResDto> galleryDashboard(Long clubId) {
-        List<Gallery> galleryList = galleryRepository.findByIdAndDeletedAndIsOfficial(clubId, false, true);
+        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Gallery Dashboard Error"));
+        List<Gallery> galleryList = galleryRepository.findByClubAndDeletedAndIsOfficial(club, false, true);
 
         return galleryList.stream().map(GalleryDto.DashboardResDto::toDashboardResDto).toList();
     }

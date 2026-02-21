@@ -50,7 +50,7 @@ public class PrincipalDetails implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+        return club != null && !Boolean.TRUE.equals(club.getDeleted());
 	}
 	
     /**

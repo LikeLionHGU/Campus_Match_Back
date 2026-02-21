@@ -7,6 +7,7 @@ import com.pigs.holiday.dto.ScheduleDto;
 import com.pigs.holiday.mapper.ClubMapper;
 import com.pigs.holiday.repository.AwardRepository;
 import com.pigs.holiday.repository.NotificationRepository;
+import com.pigs.holiday.security.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.pigs.holiday.domain.Club;
@@ -32,6 +33,8 @@ public class ClubService {
     private final MatchRequestService matchRequestService;
     private final ScheduleService scheduleService;
     private final GalleryService galleryService;
+    private final AuthService authService;
+
     private final NotificationRepository notificationRepository;
 
     private final ClubMapper clubMapper;
@@ -176,12 +179,13 @@ public class ClubService {
     }
 
     @Transactional
-    public ClubDto.SettingDeleteResDto delete(Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("delete Error"));
-        club.setDeleted(true);
-        return ClubDto.SettingDeleteResDto.builder()
-                .clubId(clubId)
-                .build();
+    public ClubDto.SettingDeleteResDto delete(Long requestClubId) {
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("delete Error"));
+        requestClub.setDeleted(true);
+
+        authService.revokeRefreshToken(requestClub.getId());
+
+        return ClubDto.SettingDeleteResDto.builder().clubId(requestClub.getId()).build();
     }
 
     // List

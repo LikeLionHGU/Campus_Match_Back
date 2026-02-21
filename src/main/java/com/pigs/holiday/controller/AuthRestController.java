@@ -1,5 +1,7 @@
 package com.pigs.holiday.controller;
 
+import com.pigs.holiday.domain.Club;
+import com.pigs.holiday.repository.ClubRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import com.pigs.holiday.exception.InvalidTokenException;
@@ -20,18 +22,33 @@ public class AuthRestController {
     final ExternalProperties externalProperties;
     final AuthService authService;
 
+    final ClubRepository clubRepository;
+
     @PostMapping("")
     public ResponseEntity<Void> access(HttpServletRequest request) {
-        String accessToken = null;
         String prefix = externalProperties.getTokenPrefix();
-        String refreshToken = request.getHeader(externalProperties.getRefreshKey());
+        String header = request.getHeader(externalProperties.getRefreshKey());
 
-        if(refreshToken == null || !refreshToken.startsWith(prefix) || refreshToken.equals(prefix)) {
+        if(header == null || !header.startsWith(prefix) || header.equals(prefix)) {
             throw new InvalidTokenException("No Prefix");
         }
 
-        refreshToken = refreshToken.substring(prefix.length());
-        accessToken = prefix + authService.issueAccessToken(refreshToken);
+        String refreshToken = header.substring(prefix.length());
+
+        // 1) refreshToken 검증 + userId 획득
+        Long userId = authService.verifyRefreshToken(refreshToken);
+
+        // 2) 탈퇴 여부 확인 (clubRepository 필요)
+        Club club = clubRepository.findById(userId).orElseThrow(() -> new InvalidTokenException("No User"));
+
+        if (Boolean.TRUE.equals(club.getDeleted())) {
+            authService.revokeRefreshToken(userId);
+            throw new InvalidTokenException("Withdrawn");
+        }
+
+        String accessToken = prefix + authService.createAccessToken(userId);
+
+        // String accessToken = prefix + authService.issueAccessToken(refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK).header(externalProperties.getAccessKey(), accessToken).build();
     }
