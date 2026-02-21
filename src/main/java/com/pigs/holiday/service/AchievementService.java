@@ -30,7 +30,7 @@ public class AchievementService {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new EntityNotFoundException("클럽을 찾을 수 없습니다."));
 
-        int postCount = club.getHomeMatchPostList().size() + club.getAwayMatchPostList().size();
+        int postCount = club.getHomeMatchPostList().size();
         int matchCount = club.getTotalMatches();
         double mannerScore = club.getMannerScore();
         int photoCount = club.getGalleryList().size();
