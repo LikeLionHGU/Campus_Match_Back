@@ -44,7 +44,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .build();
         }
@@ -53,7 +53,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .awayClubId(notification.getAwayClub().getId())
                     .build();
@@ -71,7 +71,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .content(notification.getContent())
                     .build();
@@ -81,7 +81,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .build();
         }
@@ -90,7 +90,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .content(notification.getContent())
                     .build();
@@ -100,7 +100,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .build();
         }
@@ -109,7 +109,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .content(notification.getContent())
                     .build();
@@ -119,7 +119,7 @@ public class NotificationDto {
             return builder()
                     .notificationId(notification.getId())
                     .notiType(notification.getNotiType())
-                    .awayClubName(notification.getAwayClub().getName())
+                    .awayClubName(notification.getAwayClub().getClubName())
                     .awayClubUniversity(notification.getAwayClub().getUniversity())
                     .build();
         }
