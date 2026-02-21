@@ -1,9 +1,7 @@
 package com.pigs.holiday.service;
 
 import com.pigs.holiday.domain.Club;
-import com.pigs.holiday.domain.Notification;
 import com.pigs.holiday.domain.Schedule;
-import com.pigs.holiday.dto.MatchPostDto;
 import com.pigs.holiday.dto.ScheduleDto;
 import com.pigs.holiday.exception.NoPermissionException;
 import com.pigs.holiday.repository.ClubRepository;
@@ -15,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service

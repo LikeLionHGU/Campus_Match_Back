@@ -113,6 +113,8 @@ public class NotificationService {
         detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendYes", today).stream().map(NotificationDto.DetailResDto::toSendYesDetailResDto).toList());
         detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "sendNo", today).stream().map(NotificationDto.DetailResDto::toSendNoDetailResDto).toList());
 
+        listResDto.setDetailResDtoList(detailResDtoList);
+
         return listResDto;
     }
 
@@ -151,6 +153,8 @@ public class NotificationService {
         detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "receive", today).stream().map(NotificationDto.DetailResDto::toReceiveDetailResDto).toList());
         detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "receiveCancel", today).stream().map(NotificationDto.DetailResDto::toReceiveCancelDetailResDto).toList());
 
+        listResDto.setDetailResDtoList(detailResDtoList);
+
         return listResDto;
     }
 
@@ -186,6 +190,8 @@ public class NotificationService {
 
         List<NotificationDto.DetailResDto> detailResDtoList = new ArrayList<>();
         detailResDtoList.addAll(notificationRepository.findByReceiveClubAndNotiTypeAndNotiDateLessThanEqualOrderByIdDesc(club, "finish", today).stream().map(NotificationDto.DetailResDto::toFinishDetailResDto).toList());
+
+        listResDto.setDetailResDtoList(detailResDtoList);
 
         return listResDto;
     }
