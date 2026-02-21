@@ -204,11 +204,11 @@ public class MatchHistoryService {
 
         if(finishReqDto.getRematch()){
             LocalDate today = LocalDate.now();
-            Notification rematchNotification = Notification.of("rematch", today, "", false, awayClub, requestClub, null);
+            Notification rematchNotification = Notification.of("rematch", today, "", false, awayClub, requestClub);
             notificationRepository.save(rematchNotification);
-            Notification remindWeekNotification = Notification.of("remind", today.plusWeeks(1), "", false, awayClub, requestClub, null);
+            Notification remindWeekNotification = Notification.of("remind", today.plusWeeks(1), "", false, awayClub, requestClub);
             notificationRepository.save(remindWeekNotification);
-            Notification remindMonthNotification = Notification.of("remind", today.plusMonths(1), "", false, awayClub, requestClub, null);
+            Notification remindMonthNotification = Notification.of("remind", today.plusMonths(1), "", false, awayClub, requestClub);
             notificationRepository.save(remindMonthNotification);
         }
 

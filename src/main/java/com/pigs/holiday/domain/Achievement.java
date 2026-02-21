@@ -1,6 +1,5 @@
 package com.pigs.holiday.domain;
 
-import com.pigs.holiday.domain.AchievementType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

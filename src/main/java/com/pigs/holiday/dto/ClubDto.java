@@ -24,7 +24,7 @@ public class ClubDto {
         String region;
         String sportCategory;
 
-        public Club toEntity(String s3Url) { return Club.of(getUsername(), getPassword(), getName(), getUniversity(), getPhone(), getEmail(), getClubName(), getDescription(), getRegion(), getSportCategory(), s3Url, 0, 0, 0, 0, 36.5); }
+        public Club toEntity(String s3Url) { return Club.of(getUsername(), getPassword(), getName(), getUniversity(), getPhone(), getEmail(), getClubName(), getDescription(), getRegion(), getSportCategory(), s3Url, 0, 0, 0, 0, 36.5, null); }
     }
 
     // Signup Response Dto

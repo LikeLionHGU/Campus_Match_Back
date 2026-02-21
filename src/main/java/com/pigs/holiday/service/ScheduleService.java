@@ -3,6 +3,7 @@ package com.pigs.holiday.service;
 import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.Notification;
 import com.pigs.holiday.domain.Schedule;
+import com.pigs.holiday.dto.MatchPostDto;
 import com.pigs.holiday.dto.ScheduleDto;
 import com.pigs.holiday.exception.NoPermissionException;
 import com.pigs.holiday.repository.ClubRepository;
@@ -29,23 +30,22 @@ public class ScheduleService {
 
     final MatchPostService matchPostService;
 
-    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long clubId) {
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("schedule Create Error"));
-        Schedule schedule = createReqDto.toEntity(club);
-        schedule.setClub(club);
-
-        LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("schedule", today, schedule.getTitle(), false, club, null, schedule);
-        notificationRepository.save(notification);
+    public ScheduleDto.CreateResDto create(ScheduleDto.CreateReqDto createReqDto, Long requestClubId) {
+        Club requestClub = clubRepository.findById(requestClubId).orElseThrow(() -> new EntityNotFoundException("schedule Create Error"));
+        Schedule schedule = createReqDto.toEntity(requestClub);
+        schedule.setClub(requestClub);
 
         return ScheduleDto.CreateResDto.toCreateResDto(scheduleRepository.save(schedule));
     }
 
+    // List
     @Transactional(readOnly = true)
     public ScheduleDto.CalendarResDto list(Long clubId, Long requestClubId) {
+        Club requestClub = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("schedule List Error"));
+
         ScheduleDto.CalendarResDto calendarResDto = ScheduleDto.CalendarResDto.toCalendarResDto(clubId.equals(requestClubId));
 
-        calendarResDto.setScheduleResDtoList(scheduleRepository.findByClubIdAndDeleted(clubId, false).stream().map(ScheduleDto.ScheduleResDto::toScheduleResDto).collect(Collectors.toList()));
+        calendarResDto.setScheduleResDtoList(scheduleRepository.findByClubIdAndDeleted(clubId, false).stream().map(ScheduleDto.ScheduleResDto::toScheduleResDto).toList());
         calendarResDto.setUpcomingResDtoList(matchPostService.upcomingDashboard(clubId));
         calendarResDto.setOngoingResDtoList(matchPostService.ongoingDashboard(clubId));
         calendarResDto.setMatchResDtoList(matchPostService.matchPostDashboard(clubId));
@@ -97,7 +97,6 @@ public class ScheduleService {
             throw new NoPermissionException("Schedule Delete Error");
         }
 
-        notificationRepository.deleteAll(schedule.getNotificationList());
         scheduleRepository.delete(schedule);
         return ScheduleDto.DeleteResDto.toDeleteResDto(schedule);
     }

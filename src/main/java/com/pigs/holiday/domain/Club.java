@@ -9,6 +9,7 @@ import lombok.Setter;
 import com.pigs.holiday.dto.ClubDto;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class Club extends AuditingFields {
     int totalDraws;
     int totalLosses;
     double mannerScore;
+    LocalDate dashboardDate;
 
     @OneToMany(mappedBy = "homeClub")
     private List<MatchHistory> homeMatchHistoryList = new ArrayList<>();
@@ -71,7 +73,7 @@ public class Club extends AuditingFields {
     private List<Award> awardList = new ArrayList<>();
 
     protected Club(){}
-    private Club(String username, String password, String name, String university, String phone, String email, String clubName, String description, String region, String sportCategory, String imageUrl, int totalMatches, int totalWins, int totalDraws, int totalLosses, double mannerScore) {
+    private Club(String username, String password, String name, String university, String phone, String email, String clubName, String description, String region, String sportCategory, String imageUrl, int totalMatches, int totalWins, int totalDraws, int totalLosses, double mannerScore, LocalDate dashboardDate) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -88,9 +90,10 @@ public class Club extends AuditingFields {
         this.totalDraws = totalDraws;
         this.totalLosses = totalLosses;
         this.mannerScore = mannerScore;
+        this.dashboardDate = dashboardDate;
     }
-    public static Club of(String username, String password, String name, String university, String phone, String email, String clubName, String description, String region, String sportCategory, String imageUrl, int totalMatches, int totalWins, int totalDraws, int totalLosses, double mannerScore) {
-        return new Club(username, password,  name, university, phone, email, clubName, description, region, sportCategory, imageUrl, totalMatches, totalWins, totalDraws, totalLosses, 36.5);
+    public static Club of(String username, String password, String name, String university, String phone, String email, String clubName, String description, String region, String sportCategory, String imageUrl, int totalMatches, int totalWins, int totalDraws, int totalLosses, double mannerScore, LocalDate dashboardDate) {
+        return new Club(username, password,  name, university, phone, email, clubName, description, region, sportCategory, imageUrl, totalMatches, totalWins, totalDraws, totalLosses, mannerScore, dashboardDate);
     }
 
 

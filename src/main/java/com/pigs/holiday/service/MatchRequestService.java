@@ -35,7 +35,7 @@ public class MatchRequestService {
         MatchRequest matchRequest = createReqDto.toEntity(matchPost, requestClub);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("receive", today, "", false, matchPost.getHomeClub(), matchRequest.getSenderClub(), null);
+        Notification notification = Notification.of("receive", today, "", false, matchPost.getHomeClub(), matchRequest.getSenderClub());
         notificationRepository.save(notification);
 
         return MatchRequestDto.CreateResDto.toCreateResDto(matchRequestRepository.save(matchRequest));
@@ -98,7 +98,7 @@ public class MatchRequestService {
         matchRequestRepository.deleteById(matchRequestId);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("sendNo", today, deleteReqDto.getContent(), false, matchRequest.getSenderClub(), matchRequest.getMatchPost().getHomeClub(),  null);
+        Notification notification = Notification.of("sendNo", today, deleteReqDto.getContent(), false, matchRequest.getSenderClub(), matchRequest.getMatchPost().getHomeClub());
         notificationRepository.save(notification);
 
         return MatchRequestDto.DeleteResDto.builder().matchRequestId(matchRequest.getId()).build();
@@ -121,7 +121,7 @@ public class MatchRequestService {
         matchRequestRepository.deleteByMatchPost(matchPost);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("sendYes", today, "", false, matchPost.getAwayClub(), matchRequest.getMatchPost().getHomeClub(), null);
+        Notification notification = Notification.of("sendYes", today, "", false, matchPost.getAwayClub(), matchRequest.getMatchPost().getHomeClub());
         notificationRepository.save(notification);
 
         return MatchRequestDto.UpdateResDto.builder().matchRequestId(matchRequest.getId()).build();
@@ -152,7 +152,7 @@ public class MatchRequestService {
         }
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("receiveCancel", today, deleteReqDto.getContent(), false, matchRequest.getMatchPost().getHomeClub(), matchRequest.getSenderClub(), null);
+        Notification notification = Notification.of("receiveCancel", today, deleteReqDto.getContent(), false, matchRequest.getMatchPost().getHomeClub(), matchRequest.getSenderClub());
         notificationRepository.save(notification);
 
         matchRequestRepository.deleteById(matchRequestId);

@@ -1,11 +1,9 @@
 package com.pigs.holiday.dto;
 
-import com.pigs.holiday.domain.Gallery;
-import com.pigs.holiday.domain.GalleryImage;
+
 import com.pigs.holiday.domain.Notification;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class NotificationDto {

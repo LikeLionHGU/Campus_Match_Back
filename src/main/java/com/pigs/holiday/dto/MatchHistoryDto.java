@@ -118,9 +118,7 @@ public class MatchHistoryDto {
         Long matchHistoryId;
 
         public static UpdateResDto toUpdateResDto(MatchHistory matchHistory) {
-            return builder()
-                    .matchHistoryId(matchHistory.getId())
-                    .build();
+            return builder().matchHistoryId(matchHistory.getId()).build();
         }
     }
 
