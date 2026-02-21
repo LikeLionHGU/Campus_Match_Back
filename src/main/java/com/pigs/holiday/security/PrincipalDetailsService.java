@@ -20,7 +20,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 	 */
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Club club = clubRepository.findByUsername(username).orElse(null);
+		Club club = clubRepository.findByUsernameAndDeletedFalse(username).orElseThrow(() -> new UsernameNotFoundException("NoMatchData username: " + username));
 
 		if(club == null) {
 			throw new NoMatchingDataException("NoMatchData username: " + username);

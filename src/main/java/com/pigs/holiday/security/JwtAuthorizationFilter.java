@@ -1,5 +1,6 @@
 package com.pigs.holiday.security;
 
+import com.pigs.holiday.exception.InvalidTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,8 +48,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 		Long userId = authService.verifyAccessToken(accessToken);
 
-		// 유저 조회, 없을 시 return NoMatchingDataException(404)
+		// 유저 조회, 없을 시 return NoMatchingDataException(404) 탈퇴 사용자/없는 사용자 차단
 		Club club = clubRepository.findById(userId).orElse(null);
+        if (club == null || Boolean.TRUE.equals(club.getDeleted())) {
+            SecurityContextHolder.clearContext();
+            throw new InvalidTokenException("Withdrawn or No User");
+        }
 
 		// PrincipalDetails 생성
 		PrincipalDetails principalDetails = new PrincipalDetails(club);

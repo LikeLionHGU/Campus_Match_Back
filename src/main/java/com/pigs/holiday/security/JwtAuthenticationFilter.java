@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	 */
 	@Transactional
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-		Authentication authentication = null;
+		/*
+        Authentication authentication = null;
 		ClubDto.LoginReqDto userLoginDto = null;
 
 		// 1번. 로그인에 필요한 아이디(username)이랑 비번(password)가 있는지 먼저 확인
@@ -53,6 +54,23 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		}
 		
 		return authentication;
+        */
+
+        ClubDto.LoginReqDto userLoginDto;
+        try {
+            userLoginDto = objectMapper.readValue(request.getInputStream(), ClubDto.LoginReqDto.class);
+        } catch (IOException e) {
+            throw new org.springframework.security.authentication.AuthenticationServiceException("Invalid login body", e);
+        }
+
+        if (userLoginDto.getUsername() == null || userLoginDto.getPassword() == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Missing username/password");
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userLoginDto.getUsername(), userLoginDto.getPassword());
+
+        return authenticationManager.authenticate(authenticationToken);
 	} 
 	
 	/**
