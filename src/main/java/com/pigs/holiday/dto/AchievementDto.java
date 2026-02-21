@@ -14,6 +14,6 @@ public class AchievementDto {
         private Long id;
         private String title;
         private String imageUrl;
-        Boolean isAcquired;
+        private boolean isAcquired;
     }
 }

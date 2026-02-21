@@ -1,6 +1,7 @@
 package com.pigs.holiday.service;
 
 import com.pigs.holiday.domain.Achievement;
+import com.pigs.holiday.domain.AchievementType;
 import com.pigs.holiday.domain.Club;
 import com.pigs.holiday.domain.UserAchievement;
 import com.pigs.holiday.dto.AchievementDto;
@@ -10,6 +11,7 @@ import com.pigs.holiday.repository.UserAchievementRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -40,14 +42,18 @@ public class AchievementService {
         int rematchCount = opponentCounts.values().stream().filter(c -> c > 1).mapToInt(c -> c - 1).sum();
         int uniqueOpponentCount = opponentCounts.size();
 
-        List<Achievement> allAchievements = achievementRepository.findAll();
-        List<UserAchievement> myAchievements = userAchievementRepository.findByClub(club);
+        List<Achievement> allAchievements = achievementRepository.findAll(
+                Sort.by(Sort.Direction.ASC, "type")
+                        .and(Sort.by(Sort.Direction.ASC, "goalCount"))
+        );
 
+        List<UserAchievement> myAchievements = userAchievementRepository.findByClub(club);
         Set<Long> myAchievementIds = myAchievements.stream()
                 .map(ua -> ua.getAchievement().getId())
                 .collect(Collectors.toSet());
 
-        List<AchievementDto.ListResDto> resultList = new ArrayList<>();
+
+        Map<AchievementType, AchievementDto.ListResDto> bestAchievementMap = new LinkedHashMap<>();
 
         for (Achievement achievement : allAchievements) {
             boolean isAcquired = myAchievementIds.contains(achievement.getId());
@@ -56,20 +62,38 @@ public class AchievementService {
                 if (checkCondition(achievement, postCount, matchCount, rematchCount, uniqueOpponentCount, mannerScore, photoCount)) {
                     UserAchievement newUa = UserAchievement.of(club, achievement);
                     userAchievementRepository.save(newUa);
-                    isAcquired = true; // 이제 딴 상태로 변경
+                    isAcquired = true;
+                    myAchievementIds.add(achievement.getId());
                 }
             }
 
-            resultList.add(AchievementDto.ListResDto.builder()
+            AchievementDto.ListResDto currentDto = AchievementDto.ListResDto.builder()
                     .id(achievement.getId())
                     .title(achievement.getTitle())
                     .imageUrl(achievement.getImageUrl())
                     .isAcquired(isAcquired)
-                    .build());
+                    .build();
+
+
+            AchievementType currentType = achievement.getType();
+
+            if (!bestAchievementMap.containsKey(currentType)) {
+                bestAchievementMap.put(currentType, currentDto);
+            } else {
+                if (isAcquired) {
+                    bestAchievementMap.put(currentType, currentDto);
+                }
+            }
+
         }
 
-        return resultList;
+        List<AchievementDto.ListResDto> resultList = new ArrayList<>(bestAchievementMap.values());
+
+        return resultList.stream()
+                .filter(AchievementDto.ListResDto::isAcquired)
+                .collect(Collectors.toList());
     }
+
 
     private boolean checkCondition(Achievement achievement, int postCount, int matchCount, int rematchCount,
                                    int uniqueOpponentCount, double mannerScore, int photoCount) {
@@ -83,6 +107,7 @@ public class AchievementService {
             case Photogenic -> photoCount >= goal;
         };
     }
-
-
 }
+
+
+
