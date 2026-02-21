@@ -178,7 +178,6 @@ public class ClubService {
     @Transactional
     public ClubDto.SettingDeleteResDto delete(Long clubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("delete Error"));
-
         club.setDeleted(true);
         return ClubDto.SettingDeleteResDto.builder()
                 .clubId(clubId)
