@@ -235,7 +235,7 @@ public class MatchPostService {
         requestClub.setMannerScore(requestClub.getMannerScore()-0.5);
 
         LocalDate today = LocalDate.now();
-        Notification notification = Notification.of("matchCancel", today, upcomingDeleteReqDto.getContent(), false, matchPost.getHomeClub().getId().equals(requestClubId) ? matchPost.getAwayClub() : matchPost.getHomeClub(), requestClub,  null);
+        Notification notification = Notification.of("matchCancel", today, upcomingDeleteReqDto.getContent(), false, matchPost.getHomeClub().getId().equals(requestClubId) ? matchPost.getAwayClub() : matchPost.getHomeClub(), requestClub);
         notificationRepository.save(notification);
 
         return MatchPostDto.DeleteResDto.builder().matchPostId(matchPost.getId()).build();
@@ -284,9 +284,9 @@ public class MatchPostService {
         matchPost.setDeleted(true);
 
         LocalDate today = LocalDate.now();
-        Notification HomeNotification = Notification.of("finish", today, "", false, matchPost.getHomeClub(), matchPost.getAwayClub(),  null);
+        Notification HomeNotification = Notification.of("finish", today, "", false, matchPost.getHomeClub(), matchPost.getAwayClub());
         notificationRepository.save(HomeNotification);
-        Notification AwayNotification = Notification.of("finish", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub(),  null);
+        Notification AwayNotification = Notification.of("finish", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub());
         notificationRepository.save(AwayNotification);
 
         return MatchPostDto.DeleteResDto.builder().matchPostId(matchPost.getId()).build();
@@ -300,9 +300,9 @@ public class MatchPostService {
         List<MatchPost> matchPostList = matchPostRepository.findByStatusAndDeletedAndMatchDateLessThan(true, false, today);
         for(MatchPost matchPost : matchPostList){
             matchPost.setDeleted(true);
-            Notification HomeNotification = Notification.of("finish", today, "", false, matchPost.getHomeClub(), matchPost.getAwayClub(),  null);
+            Notification HomeNotification = Notification.of("finish", today, "", false, matchPost.getHomeClub(), matchPost.getAwayClub());
             notificationRepository.save(HomeNotification);
-            Notification AwayNotification = Notification.of("finish", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub(),  null);
+            Notification AwayNotification = Notification.of("finish", today, "", false, matchPost.getAwayClub(), matchPost.getHomeClub());
             notificationRepository.save(AwayNotification);
         }
 

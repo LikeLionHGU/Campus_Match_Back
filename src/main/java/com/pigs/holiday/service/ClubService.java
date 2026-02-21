@@ -1,8 +1,12 @@
 package com.pigs.holiday.service;
 
 import com.pigs.holiday.domain.Award;
+import com.pigs.holiday.domain.Notification;
+import com.pigs.holiday.dto.MatchPostDto;
+import com.pigs.holiday.dto.ScheduleDto;
 import com.pigs.holiday.mapper.ClubMapper;
 import com.pigs.holiday.repository.AwardRepository;
+import com.pigs.holiday.repository.NotificationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.pigs.holiday.domain.Club;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -27,6 +32,8 @@ public class ClubService {
     private final MatchRequestService matchRequestService;
     private final ScheduleService scheduleService;
     private final GalleryService galleryService;
+    private final NotificationRepository notificationRepository;
+
     private final ClubMapper clubMapper;
 
     // Signup
@@ -52,7 +59,7 @@ public class ClubService {
     }
 
     // Dashboard
-    @Transactional(readOnly = true)
+    @Transactional
     public ClubDto.DashboardResDto dashboard(Long clubId, Long requestClubId) {
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("Club Dashboard Error"));
 
@@ -64,11 +71,28 @@ public class ClubService {
         dashboardResDto.setPastResDtoList(matchPostService.pastDashboard(clubId));
         dashboardResDto.setReceiveResDtoList(matchRequestService.receiveDashboard(clubId));
         dashboardResDto.setSendResDtoList(matchRequestService.sendDashboard(clubId));
-        if(dashboardResDto.getIsMine()){
-            dashboardResDto.setScheduleResDtoList(scheduleService.scheduleDashboard(clubId));
-        }
+        dashboardResDto.setScheduleResDtoList(scheduleService.scheduleDashboard(clubId));
         dashboardResDto.setGalleryResDtoList(galleryService.galleryDashboard(clubId));
 
+        LocalDate today = LocalDate.now();
+
+        if(!today.equals(club.getDashboardDate())) {
+            for(ScheduleDto.DashboardResDto schedule : dashboardResDto.getScheduleResDtoList()){
+                if(!schedule.getStartDate().isAfter(today) && !schedule.getEndDate().isBefore(today)){
+                    Notification scheduleNotification = Notification.of("schedule", today, schedule.getTitle(), false, club, null);
+                    notificationRepository.save(scheduleNotification);
+                }
+            }
+
+            for(MatchPostDto.DashboardResDto ongoing : dashboardResDto.getOngoingResDtoList()){
+                if(ongoing.getMatchDate().equals(today)){
+                    Notification scheduleNotification = Notification.of("schedule", today, ongoing.getClubName(), false, club, null);
+                    notificationRepository.save(scheduleNotification);
+                }
+            }
+
+            club.setDashboardDate(today);
+        }
 
         return dashboardResDto;
     }

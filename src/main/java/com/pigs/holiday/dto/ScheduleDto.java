@@ -1,10 +1,7 @@
 package com.pigs.holiday.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pigs.holiday.domain.Club;
-import com.pigs.holiday.domain.MatchPost;
-import com.pigs.holiday.domain.MatchRequest;
 import com.pigs.holiday.domain.Schedule;
 import lombok.*;
 

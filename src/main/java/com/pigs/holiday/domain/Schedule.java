@@ -25,9 +25,6 @@ public class Schedule extends AuditingFields {
     @JoinColumn(name = "club_id", nullable = false)
     private Club club;
 
-    @OneToMany(mappedBy = "schedule")
-    private List<Notification> notificationList = new ArrayList<>();
-
     protected Schedule(){}
     private Schedule(String title, LocalDate startDate, LocalDate endDate, Club club, LocalTime startTime, LocalTime endTime) {
         this.title = title;

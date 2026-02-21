@@ -1,7 +1,5 @@
 package com.pigs.holiday.dto;
 
-import com.pigs.holiday.domain.Achievement;
-
 import lombok.*;
 
 
