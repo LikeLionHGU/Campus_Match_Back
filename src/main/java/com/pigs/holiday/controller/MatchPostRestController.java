@@ -134,8 +134,8 @@ public class MatchPostRestController {
     // ScheduleDetail
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/schedule/detail/{clubId}")
-    public ResponseEntity<MatchPostDto.ScheduleDetailResDto> scheduleDetail(@PathVariable Long clubId, @RequestParam("matchPostId") Long matchPostId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        return ResponseEntity.ok(matchPostService.scheduleDetail(clubId, matchPostId, getReqUserId(principalDetails)));
+    public ResponseEntity<MatchPostDto.ScheduleDetailResDto> scheduleDetail(@PathVariable Long clubId, @RequestParam("matchPostId") Long matchPostId){
+        return ResponseEntity.ok(matchPostService.scheduleDetail(clubId, matchPostId));
     }
 
 }

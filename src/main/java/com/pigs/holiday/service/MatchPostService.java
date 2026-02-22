@@ -334,14 +334,15 @@ public class MatchPostService {
 
     // ScheduleDetail
     @Transactional(readOnly = true)
-    public MatchPostDto.ScheduleDetailResDto scheduleDetail(Long clubId, Long matchPostId, Long requestClubId){
-        Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("MatchPost ScheduleDetail Error"));
+    public MatchPostDto.ScheduleDetailResDto scheduleDetail(Long clubId, Long matchPostId){
         MatchPost matchPost = matchPostRepository.findById(matchPostId).orElseThrow(() -> new EntityNotFoundException("MatchPost ScheduleDetail Error"));
 
-        if(club.equals(matchPost.getHomeClub())){
-            return MatchPostDto.ScheduleDetailResDto.toScheduleHomeDetailDto(matchPost, club.getId().equals(requestClubId));
-        }else if(club.equals(matchPost.getAwayClub())){
-            return MatchPostDto.ScheduleDetailResDto.toScheduleAwayDetailDto(matchPost, club.getId().equals(requestClubId));
+        if(matchPost.getStatus() == false){
+            return MatchPostDto.ScheduleDetailResDto.toScheduleAwayDetailDto(matchPost);
+        }else if(clubId.equals(matchPost.getHomeClub().getId())){
+            return MatchPostDto.ScheduleDetailResDto.toScheduleHomeDetailDto(matchPost);
+        }else if(clubId.equals(matchPost.getAwayClub().getId())){
+            return MatchPostDto.ScheduleDetailResDto.toScheduleAwayDetailDto(matchPost);
         }else{
             throw new RuntimeException("MatchPost ScheduleDetail Error");
         }

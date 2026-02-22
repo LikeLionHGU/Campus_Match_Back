@@ -291,9 +291,8 @@ public class MatchPostDto {
         String phone;
         String content;
         Boolean status;
-        Boolean isMine;
 
-        public static ScheduleDetailResDto toScheduleHomeDetailDto(MatchPost matchPost, Boolean isMine) {
+        public static ScheduleDetailResDto toScheduleHomeDetailDto(MatchPost matchPost) {
             return builder()
                     .matchPostId(matchPost.getId())
                     .sportCategory(matchPost.getSportCategory())
@@ -307,11 +306,10 @@ public class MatchPostDto {
                     .phone(matchPost.getAwayClub().getPhone())
                     .content(matchPost.getContent())
                     .status(matchPost.getStatus())
-                    .isMine(isMine)
                     .build();
         }
 
-        public static ScheduleDetailResDto toScheduleAwayDetailDto(MatchPost matchPost, Boolean isMine) {
+        public static ScheduleDetailResDto toScheduleAwayDetailDto(MatchPost matchPost) {
             return builder()
                     .matchPostId(matchPost.getId())
                     .sportCategory(matchPost.getSportCategory())
@@ -325,7 +323,6 @@ public class MatchPostDto {
                     .phone(matchPost.getHomeClub().getPhone())
                     .content(matchPost.getContent())
                     .status(matchPost.getStatus())
-                    .isMine(isMine)
                     .build();
         }
     }

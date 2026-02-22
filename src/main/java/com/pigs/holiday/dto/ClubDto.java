@@ -33,6 +33,17 @@ public class ClubDto {
         Long id;
     }
 
+    // IsValidId Response Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class IsValidIdResDto {
+        Boolean isValidId;
+
+        public static IsValidIdResDto toInfoResDto(Boolean isValidId) {
+            return builder().isValidId(isValidId).build();
+        }
+    }
+
+
     // Login Request Dto
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class LoginReqDto {
@@ -238,5 +249,23 @@ public class ClubDto {
         Long clubId;
         String clubName;
         String university;
+    }
+
+    // SignupValid Request Dto
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class SignupValidReqDto {
+        String username;
+        String password;
+        String name;
+        String university;
+        String phone;
+        String email;
+        String clubName;
+        String description;
+        String region;
+        String sportCategory;
+        String emailVerificationToken;
+
+        public Club toEntity(String s3Url) { return Club.of(getUsername(), getPassword(), getName(), getUniversity(), getPhone(), getEmail(), getClubName(), getDescription(), getRegion(), getSportCategory(), s3Url, 0, 0, 0, 0, 36.5, null); }
     }
 }
