@@ -237,6 +237,7 @@ public class ClubDto {
         String clubName;
         String sportCategory;
         double mannerScore;
+        String imageUrl;
     }
 
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
