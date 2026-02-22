@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pigs.holiday.mapper.UnivMapper">
+
+    <!--Search-->
+    <select id="search" resultType="com.pigs.holiday.dto.UnivDto$SearchResDto">
+        SELECT univ.id as univId,
+        univ.name as name,
+        univ.address as address
+
+        FROM univ
+        WHERE 1=1
+        AND univ.deleted = false
+
+        <if test="searchReqDto.keyword != null and searchReqDto.keyword.trim() != ''">
+            AND (univ.name LIKE CONCAT('%', #{searchReqDto.keyword}, '%')
+            OR univ.address LIKE CONCAT('%', #{searchReqDto.keyword}, '%'))
+        </if>
+        ORDER BY univ.name ASC
+    </select>
+
+</mapper>
