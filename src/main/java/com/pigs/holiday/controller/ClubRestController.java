@@ -42,6 +42,12 @@ public class ClubRestController {
         return ResponseEntity.ok(clubService.signup(signupReqDto, s3Url));
     }
 
+    // IsValidId
+    @PostMapping(value = "/isValidId")
+    public ResponseEntity<ClubDto.IsValidIdResDto> isValidId(@RequestParam("username") String username) {
+        return ResponseEntity.ok(clubService.isValidId(username));
+    }
+
     // Info
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/info")
@@ -119,5 +125,16 @@ public class ClubRestController {
     @PostMapping("/search")
     public ResponseEntity<List<ClubDto.SearchResDto>> search(@RequestBody ClubDto.SearchReqDto searchReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return ResponseEntity.ok(clubService.search(searchReqDto, getReqUserId(principalDetails)));
+    }
+
+    // SignupValid
+    @PostMapping(value = "/signupValid", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ClubDto.SignupResDto> signupValid(@RequestPart("request") ClubDto.SignupValidReqDto signupValidReqDto, @RequestPart(value = "image", required = false) MultipartFile file)  throws IOException {
+        String s3Url = null;
+        if (file != null && !file.isEmpty()) {
+            s3Url = fileService.uploadFile(file, "likepigs/");
+        }
+
+        return ResponseEntity.ok(clubService.signupValid(signupValidReqDto, s3Url));
     }
 }

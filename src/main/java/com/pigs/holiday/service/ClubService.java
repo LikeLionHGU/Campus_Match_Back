@@ -34,6 +34,7 @@ public class ClubService {
     private final ScheduleService scheduleService;
     private final GalleryService galleryService;
     private final AuthService authService;
+    private final EmailVerificationService emailVerificationService;
 
     private final NotificationRepository notificationRepository;
 
@@ -51,6 +52,12 @@ public class ClubService {
         club = clubRepository.save(signupReqDto.toEntity(s3Url));
 
         return club.toSignupResDto();
+    }
+
+    // IsValidId
+    @Transactional(readOnly = true)
+    public ClubDto.IsValidIdResDto isValidId(String username) {
+        return ClubDto.IsValidIdResDto.toInfoResDto(clubRepository.existsByUsername(username));
     }
 
     // Info
@@ -198,6 +205,25 @@ public class ClubService {
     @Transactional(readOnly = true)
     public List<ClubDto.SearchResDto> search(ClubDto.SearchReqDto searchReqDto, Long requestClubId) {
         return clubMapper.search(searchReqDto, requestClubId);
+    }
+
+    // SignupValid
+    public ClubDto.SignupResDto signupValid(ClubDto.SignupValidReqDto signupValidReqDto, String s3Url) {
+
+        emailVerificationService.consumeToken(
+                signupValidReqDto.getEmail(),
+                signupValidReqDto.getEmailVerificationToken()
+        );
+
+        Club club = clubRepository.findByUsername(signupValidReqDto.getUsername()).orElse(null);
+        if(club != null) {
+            throw new RuntimeException("Already exist");
+        }
+
+        signupValidReqDto.setPassword(bCryptPasswordEncoder.encode(signupValidReqDto.getPassword()));
+        club = clubRepository.save(signupValidReqDto.toEntity(s3Url));
+
+        return club.toSignupResDto();
     }
 
 }

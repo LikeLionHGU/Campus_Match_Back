@@ -12,5 +12,6 @@ import java.util.Optional;
 public interface ClubRepository extends JpaRepository<Club, Long> {
     Optional<Club> findByUsername(String username);
     Optional<Club> findByUsernameAndDeletedFalse(String username);
-    Optional<Club> findByIdAndDeletedFalse(Long id);
+
+    Boolean existsByUsername(String username);
 }
