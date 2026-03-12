@@ -66,7 +66,7 @@
 
 
 # API 명세서
----
+
 ## 목차
 - [/api/badge](#apibadge)
 - [/api/club](#apiclub)
