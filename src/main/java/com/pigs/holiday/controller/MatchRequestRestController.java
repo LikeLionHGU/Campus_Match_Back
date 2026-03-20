@@ -77,7 +77,7 @@ public class MatchRequestRestController {
 
     // SendDelete
     @PreAuthorize("hasRole('USER')")
-    @DeleteMapping("send/delete/{matchRequestId}")
+    @DeleteMapping("send/{matchRequestId}")
     public ResponseEntity<MatchRequestDto.DeleteResDto> sendDelete(@PathVariable Long matchRequestId, @RequestBody MatchRequestDto.DeleteReqDto deleteReqDto, @AuthenticationPrincipal PrincipalDetails principalDetails){
         return ResponseEntity.ok(matchRequestService.sendDelete(matchRequestId, deleteReqDto, getReqUserId(principalDetails)));
     }
