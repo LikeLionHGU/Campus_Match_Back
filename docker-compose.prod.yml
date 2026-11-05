@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "127.0.0.1:8084:8080"   # 서버포트:앱포트. 127.0.0.1 = 터널로만 공개
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/campusmatch?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${DB_ROOT_PASSWORD}
+      JAVA_TOOL_OPTIONS: "-Xmx512m"
+      TZ: Asia/Seoul
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 768m
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: campusmatch
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: Asia/Seoul
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    mem_limit: 512m
+
+volumes:
+  db_data:
