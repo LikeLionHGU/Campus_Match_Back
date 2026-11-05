@@ -38,14 +38,7 @@ external:
     refreshKey: RefreshToken
     refreshTokenExpirationTime: ${JWT_REFRESH_EXPIRATION_MS:1209600000} # 14일 (Integer 최대치 약 24일)
 
-cloud:
-  aws:
-    credentials:
-      accessKey: ${AWS_ACCESS_KEY}
-      secretKey: ${AWS_SECRET_KEY}
-    region:
-      static: ${AWS_REGION:ap-northeast-2}
-    s3:
-      bucket: ${AWS_S3_BUCKET}
-    stack:
-      auto: false
+# 업로드 파일 저장 위치와 외부에서 접근할 주소 (URL = public-url + /files/...)
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:./uploads}
+  public-url: ${FILE_PUBLIC_URL:http://localhost:8080}

@@ -1,65 +1,88 @@
 package com.pigs.holiday.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import lombok.RequiredArgsConstructor;
-import com.pigs.holiday.config.S3Config;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
+/**
+ * 업로드 파일을 서버 로컬 디스크(file.upload-dir)에 저장하고,
+ * {file.public-url}/files/{dirName}{uuid}.{ext} 형태의 URL을 돌려준다.
+ * 저장된 파일은 WebConfig의 /files/** 리소스 핸들러로 제공된다.
+ */
 @Service
-@RequiredArgsConstructor
 public class FileService {
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
+    public static final String URL_PATH = "/files/";
 
-    private final S3Config s3Config;
-    private final AmazonS3Client amazonS3Client;
+    // 이미지 업로드만 허용 (html 등 업로드 후 같은 도메인에서 실행되는 것을 막는다)
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif", "webp", "bmp", "heic", "heif");
 
-    public String uploadFile(MultipartFile file, String dirName) throws IOException {
+    private final Path uploadRoot;
+    private final String publicUrl;
 
-        //뽑아낸 이미지 파일에서 이름 및 확장자 추출
-        String fileName = file.getOriginalFilename();
-        String fileExtension = fileName.substring(fileName.indexOf("."));
-        String uuidFileName = dirName + UUID.randomUUID() + fileExtension;
-
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(file.getSize());
-        metadata.setContentType(file.getContentType());
-
-        s3Config.amazonS3Client().putObject(
-                new PutObjectRequest(bucket, uuidFileName, file.getInputStream(), metadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead)
-        );
-
-        String s3Url = s3Config.amazonS3Client().getUrl(bucket, uuidFileName).toString();
-
-
-        return s3Url;
+    public FileService(@Value("${file.upload-dir}") String uploadDir,
+                       @Value("${file.public-url:}") String publicUrl) {
+        this.uploadRoot = Paths.get(uploadDir).toAbsolutePath().normalize();
+        this.publicUrl = publicUrl.endsWith("/") ? publicUrl.substring(0, publicUrl.length() - 1) : publicUrl;
     }
 
+    public String uploadFile(MultipartFile file, String dirName) throws IOException {
+        String extension = extractExtension(file.getOriginalFilename());
+
+        Path dir = uploadRoot.resolve(dirName).normalize();
+        if (!dir.startsWith(uploadRoot)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid upload directory");
+        }
+        Files.createDirectories(dir);
+
+        String fileName = UUID.randomUUID() + "." + extension;
+        try (InputStream in = file.getInputStream()) {
+            Files.copy(in, dir.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        String relative = uploadRoot.relativize(dir.resolve(fileName)).toString().replace('\\', '/');
+        return publicUrl + URL_PATH + relative;
+    }
 
     public List<String> uploadFiles(List<MultipartFile> files, String dirName) throws IOException {
-        List<String> s3Urls = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
 
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
-                    s3Urls.add(uploadFile(file, dirName));
+                    urls.add(uploadFile(file, dirName));
                 }
             }
         }
-        return s3Urls;
+        return urls;
     }
 
+    public Path getUploadRoot() {
+        return uploadRoot;
+    }
 
+    private String extractExtension(String originalFilename) {
+        if (originalFilename == null || originalFilename.lastIndexOf('.') < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File extension is required");
+        }
+        String extension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only image files are allowed");
+        }
+        return extension;
+    }
 }

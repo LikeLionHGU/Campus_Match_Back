@@ -34,8 +34,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-    // S3
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    // Jackson 2 (security 필터에서 com.fasterxml ObjectMapper 사용. 이전엔 AWS SDK가 끌어왔음)
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // Google API Client
     implementation 'com.google.api-client:google-api-client:2.6.0'
