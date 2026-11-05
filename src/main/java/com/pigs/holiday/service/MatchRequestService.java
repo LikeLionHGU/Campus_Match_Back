@@ -82,8 +82,11 @@ public class MatchRequestService {
 
     // ReceiveDetail
     @Transactional(readOnly = true)
-    public MatchRequestDto.DetailResDto receiveDetail(Long matchRequestId){
+    public MatchRequestDto.DetailResDto receiveDetail(Long matchRequestId, Long requestClubId){
         MatchRequest matchRequest = matchRequestRepository.findById(matchRequestId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDetail Error"));
+        if(!matchRequest.getMatchPost().getHomeClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("MatchRequest ReceiveDetail Error");
+        }
         return MatchRequestDto.DetailResDto.toReceiveDetailResDto(matchRequest);
     }
 
@@ -138,8 +141,11 @@ public class MatchRequestService {
 
     // SendDetail
     @Transactional(readOnly = true)
-    public MatchRequestDto.DetailResDto sendDetail(Long matchRequestId){
-        MatchRequest matchRequest = matchRequestRepository.findById(matchRequestId).orElseThrow(() -> new EntityNotFoundException("MatchRequest ReceiveDetail Error"));
+    public MatchRequestDto.DetailResDto sendDetail(Long matchRequestId, Long requestClubId){
+        MatchRequest matchRequest = matchRequestRepository.findById(matchRequestId).orElseThrow(() -> new EntityNotFoundException("MatchRequest SendDetail Error"));
+        if(!matchRequest.getSenderClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("MatchRequest SendDetail Error");
+        }
         return MatchRequestDto.DetailResDto.toSendDetailResDto(matchRequest);
     }
 

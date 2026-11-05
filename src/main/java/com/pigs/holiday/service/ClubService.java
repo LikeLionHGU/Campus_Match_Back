@@ -8,6 +8,7 @@ import com.pigs.holiday.mapper.ClubMapper;
 import com.pigs.holiday.repository.AwardRepository;
 import com.pigs.holiday.repository.NotificationRepository;
 import com.pigs.holiday.security.AuthService;
+import com.pigs.holiday.exception.NoPermissionException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.pigs.holiday.domain.Club;
@@ -139,25 +140,39 @@ public class ClubService {
     @Transactional
     public ClubDto.AwardDeleteResDto awardDelete(Long awardId, Long requestClubId) {
         Award award = awardRepository.findById(awardId).orElseThrow(() -> new EntityNotFoundException("Award Delete Error"));
-        if(award.getClub().getId().equals(requestClubId)) {
-            awardRepository.deleteById(awardId);
+        if(!award.getClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("Award Delete Error");
         }
+
+        awardRepository.deleteById(awardId);
 
         return ClubDto.AwardDeleteResDto.toAwardDeleteResDto(award);
     }
 
+    // 본인 동아리인지 확인 (설정 조회/수정은 본인만 가능)
+    public void checkOwner(Long clubId, Long requestClubId) {
+        if(clubId == null || !clubId.equals(requestClubId)) {
+            throw new NoPermissionException("Club Setting Error");
+        }
+    }
+
     @Transactional(readOnly = true)
-    public ClubDto.SettingDetailResDto settingDetail(Long clubId) {
+    public ClubDto.SettingDetailResDto settingDetail(Long clubId, Long requestClubId) {
+        checkOwner(clubId, requestClubId);
         Club club = clubRepository.findById(clubId).orElseThrow(() -> new EntityNotFoundException("clubDetail Error"));
         return ClubDto.SettingDetailResDto.toSettingDetailResDto(club);
     }
 
     @Transactional
-    public ClubDto.SettingUpdateResDto settingUpdate(ClubDto.SettingUpdateReqDto settingUpdateReqDto, Long clubId, String s3Url) {
+    public ClubDto.SettingUpdateResDto settingUpdate(ClubDto.SettingUpdateReqDto settingUpdateReqDto, Long clubId, String s3Url, Long requestClubId) {
+        checkOwner(clubId, requestClubId);
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new EntityNotFoundException("Setting update Error: " + clubId + " not found"));
 
         if(StringUtils.hasText(settingUpdateReqDto.getUsername()) && !settingUpdateReqDto.getUsername().equals(club.getUsername())) {
+            if(clubRepository.existsByUsername(settingUpdateReqDto.getUsername())) {
+                throw new RuntimeException("Already exist");
+            }
             club.setUsername(settingUpdateReqDto.getUsername());
         }
         if(StringUtils.hasText(settingUpdateReqDto.getPassword()) && !settingUpdateReqDto.getPassword().equals(club.getPassword())) {

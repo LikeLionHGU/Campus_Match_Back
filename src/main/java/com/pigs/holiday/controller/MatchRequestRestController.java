@@ -43,8 +43,8 @@ public class MatchRequestRestController {
     // ReceiveDetail
     @PreAuthorize("hasRole('USER')")
     @GetMapping("receive/{matchRequestId}")
-    public ResponseEntity<MatchRequestDto.DetailResDto> receiveDetail(@PathVariable Long matchRequestId){
-        return ResponseEntity.ok(matchRequestService.receiveDetail(matchRequestId));
+    public ResponseEntity<MatchRequestDto.DetailResDto> receiveDetail(@PathVariable Long matchRequestId, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchRequestService.receiveDetail(matchRequestId, getReqUserId(principalDetails)));
     }
 
     // ReceiveDelete
@@ -71,8 +71,8 @@ public class MatchRequestRestController {
     // SendDetail
     @PreAuthorize("hasRole('USER')")
     @GetMapping("send/{matchRequestId}")
-    public ResponseEntity<MatchRequestDto.DetailResDto> sendDetail(@PathVariable Long matchRequestId){
-        return ResponseEntity.ok(matchRequestService.sendDetail(matchRequestId));
+    public ResponseEntity<MatchRequestDto.DetailResDto> sendDetail(@PathVariable Long matchRequestId, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        return ResponseEntity.ok(matchRequestService.sendDetail(matchRequestId, getReqUserId(principalDetails)));
     }
 
     // SendDelete

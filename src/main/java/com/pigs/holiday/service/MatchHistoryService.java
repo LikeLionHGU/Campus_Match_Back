@@ -101,37 +101,17 @@ public class MatchHistoryService {
             Club awayClub = clubRepository.findById(updateReqDto.getAwayClubId()).orElseThrow(() -> new EntityNotFoundException("MatchHistory Update Error"));
             matchHistory.setAwayClub(awayClub);
         }
+        // 기존 결과를 먼저 되돌리고, 수정된 결과를 다시 반영한다 (중복 집계 방지)
+        applyResult(homeClub, matchHistory.getMatchType(), matchHistory.getResult(), -1);
+
         if(updateReqDto.getMatchType()!=null) {
-            if(matchHistory.getMatchType()) {
-                switch (matchHistory.getResult()) {
-                    case "승":
-                        homeClub.setTotalWins(homeClub.getTotalWins()-1);
-                        break;
-                    case "패":
-                        homeClub.setTotalLosses(homeClub.getTotalLosses()-1);
-                        break;
-                    case "무":
-                        homeClub.setTotalDraws(homeClub.getTotalDraws()-1);
-                        break;
-                }
-            }
             matchHistory.setMatchType(updateReqDto.getMatchType());
+        }
+        if(StringUtils.hasText(updateReqDto.getResult())) {
             matchHistory.setResult(updateReqDto.getResult());
         }
 
-        if(matchHistory.getMatchType()){
-            switch (matchHistory.getResult()) {
-                case "승":
-                    homeClub.setTotalWins(homeClub.getTotalWins()+1);
-                    break;
-                case "패":
-                    homeClub.setTotalLosses(homeClub.getTotalLosses()+1);
-                    break;
-                case "무":
-                    homeClub.setTotalDraws(homeClub.getTotalDraws()+1);
-                    break;
-            }
-        }
+        applyResult(homeClub, matchHistory.getMatchType(), matchHistory.getResult(), 1);
 
         return MatchHistoryDto.UpdateResDto.toUpdateResDto(matchHistoryRepository.save(matchHistory));
     }
@@ -222,6 +202,19 @@ public class MatchHistoryService {
         galleryService.finish(GalleryDto.CreateReqDto.toCreateReqDto(finishReqDto, matchHistory), imageUrls, requestClubId);
 
         return MatchHistoryDto.FinishResDto.toFinishResDto(matchHistoryRepository.save(matchHistory));
+    }
+
+    // 공식 경기(matchType=true)일 때만 승/무/패를 delta(+1 또는 -1)만큼 반영
+    private void applyResult(Club club, Boolean matchType, String result, int delta) {
+        if(!Boolean.TRUE.equals(matchType) || result == null) {
+            return;
+        }
+        switch (result) {
+            case "승" -> club.setTotalWins(club.getTotalWins() + delta);
+            case "패" -> club.setTotalLosses(club.getTotalLosses() + delta);
+            case "무" -> club.setTotalDraws(club.getTotalDraws() + delta);
+            default -> { }
+        }
     }
 
 }

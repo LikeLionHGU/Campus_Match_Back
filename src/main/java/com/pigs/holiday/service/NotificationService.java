@@ -5,6 +5,7 @@ import com.pigs.holiday.domain.Notification;
 import com.pigs.holiday.dto.NotificationDto;
 import com.pigs.holiday.repository.ClubRepository;
 import com.pigs.holiday.repository.NotificationRepository;
+import com.pigs.holiday.exception.NoPermissionException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -197,8 +198,11 @@ public class NotificationService {
     }
 
     // Delete
-    public NotificationDto.DeleteResDto delete(Long notificationId){
+    public NotificationDto.DeleteResDto delete(Long notificationId, Long requestClubId){
         Notification notification = notificationRepository.findById(notificationId).orElseThrow(() -> new EntityNotFoundException("Notification Delete Error"));
+        if(!notification.getReceiveClub().getId().equals(requestClubId)) {
+            throw new NoPermissionException("Notification Delete Error");
+        }
         notificationRepository.deleteById(notificationId);
 
         return NotificationDto.DeleteResDto.toDeleteResDto(notification);

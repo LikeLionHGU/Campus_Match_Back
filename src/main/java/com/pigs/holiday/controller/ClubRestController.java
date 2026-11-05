@@ -92,19 +92,21 @@ public class ClubRestController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/setting/{clubId}")
-    public ResponseEntity<ClubDto.SettingDetailResDto> settingDetail(@PathVariable Long clubId) {
-        return ResponseEntity.ok(clubService.settingDetail(clubId));
+    public ResponseEntity<ClubDto.SettingDetailResDto> settingDetail(@PathVariable Long clubId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(clubService.settingDetail(clubId, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping(value = "/setting/{clubId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ClubDto.SettingUpdateResDto> settingUpdate(@PathVariable Long clubId, @RequestPart("request") ClubDto.SettingUpdateReqDto settingUpdateReqDto, @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
+    public ResponseEntity<ClubDto.SettingUpdateResDto> settingUpdate(@PathVariable Long clubId, @RequestPart("request") ClubDto.SettingUpdateReqDto settingUpdateReqDto, @RequestPart(value = "image", required = false) MultipartFile file, @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException {
+        clubService.checkOwner(clubId, getReqUserId(principalDetails));
+
         String s3Url = null;
         if (file != null && !file.isEmpty()) {
             s3Url = fileService.uploadFile(file, "likepigs/");
         }
 
-        return ResponseEntity.ok(clubService.settingUpdate(settingUpdateReqDto, clubId, s3Url));
+        return ResponseEntity.ok(clubService.settingUpdate(settingUpdateReqDto, clubId, s3Url, getReqUserId(principalDetails)));
     }
 
     @PreAuthorize("hasRole('USER')")

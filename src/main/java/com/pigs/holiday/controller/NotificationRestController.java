@@ -62,8 +62,8 @@ public class NotificationRestController {
     // Delete
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/noti/{notificationId}")
-    public ResponseEntity<NotificationDto.DeleteResDto> delete (@PathVariable Long notificationId) {
-        return ResponseEntity.ok(notificationService.delete(notificationId));
+    public ResponseEntity<NotificationDto.DeleteResDto> delete (@PathVariable Long notificationId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(notificationService.delete(notificationId, getReqUserId(principalDetails)));
     }
 
 }
